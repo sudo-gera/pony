@@ -4,8 +4,7 @@
 #include <iostream>
 #include <algorithm>
 class inf{
-	public:
-//private:
+private:
 	struct Ninf{
 	public:
 		std::vector<uint32_t> digits;
@@ -14,7 +13,7 @@ class inf{
 				digits.pop_back();
 			}
 		}
-		std::string tostr(){
+		explicit operator std::string(){
 			std::string e;
 			Ninf t=*this;
 			Ninf m,n;
@@ -106,9 +105,7 @@ class inf{
 				for (uint_least64_t i=0;i<o.digits.size();i++){
 					Ninf s;
 					uint_least64_t d=(uint_least64_t)(digits[u])*(uint_least64_t)(o.digits[i]);
-					for (uint_least64_t w=0;w<i+u;w++){
-						s.digits.push_back(0);
-					}
+					s.digits=std::vector<uint32_t> (u+i);
 					s.digits.push_back(d);
 					s.digits.push_back(d>>8*sizeof(int32_t));
 					s.norm();
@@ -119,6 +116,25 @@ class inf{
 			return a;
 		}
 		inline Ninf operator/(Ninf o){
+			Ninf c=1;
+			Ninf a=0;
+			while (digits.size()>o.digits.size()){
+				o=o<<(sizeof(int32_t)*8);
+				c=c<<(sizeof(int32_t)*8);
+			}
+			while (this->diff(o)!=-1){
+				c=c<<1;
+				o=o<<1;
+			}
+			while (c.diff(0)){
+				if (this->diff(o)>-1){
+					*this=this->add(o,-1);
+					a=a.add(c,1);
+				}
+				c=c>>1;
+				o=o>>1;
+			}
+			return a;
 			Ninf b(0);
 			Ninf one(1);
 			Ninf five(1LL<<(8*sizeof(int32_t)-1));
@@ -140,6 +156,66 @@ class inf{
 			}
 			b.norm();
 			return b;
+		}
+		inline Ninf operator<<(Ninf o){
+			Ninf a=*this;
+			Ninf r;
+			uint32_t s;
+			if(o.diff(sizeof(int32_t)*8)==-1){
+				r=0;
+			}else if(o.diff(sizeof(int32_t)*8*2)==-1){
+				r=1;
+			}else {
+				r=o/(sizeof(int32_t)*8);
+			}
+			s=uint_least64_t(o.add(r*sizeof(int32_t)*8,-1));
+			if(r.diff(digits.size())==1){
+				r=digits.size();
+			}
+			auto dig=std::vector<uint32_t>();
+			while (r.diff(0)>0){
+				r.add(1,-1);
+				dig.resize(dig.size()+1);
+			}
+			dig.insert(dig.end(),a.digits.begin(), a.digits.end());
+			a.digits=dig;
+			int_least64_t t=0;
+			int32_t y=0;
+			for(auto d=a.digits.begin();d!=a.digits.end();d++){
+				t=(int_least64_t)(*d);
+				t<<=s;
+				*d=t;
+				*d+=y;
+				y=t>>(sizeof(int32_t)*8);
+			}
+			return a;
+		}
+		inline Ninf operator>>(Ninf o){
+			Ninf a=*this;
+			Ninf r;
+			uint32_t s;
+			if(o.diff(sizeof(int32_t)*8)==-1){
+				r=0;
+			}else if(o.diff(sizeof(int32_t)*8*2)==-1){
+				r=1;
+			}else {
+				r=o/(sizeof(int32_t)*8);
+			}
+			s=uint_least64_t(o.add(r*sizeof(int32_t)*8,-1));
+			if(r.diff(digits.size())==1){
+				r=digits.size();
+			}
+			a.digits=std::vector<uint32_t>(a.digits.begin()+uint_least64_t(r),a.digits.end());
+			int_least64_t t=0;
+			int32_t y=0;
+			for(auto d=a.digits.rbegin();d!=a.digits.rend();d++){
+				t=(int_least64_t)(*d)<<(sizeof(int32_t)*8);
+				t>>=s;
+				*d=t>>(sizeof(int32_t)*8);
+				*d+=y;
+				y=t;
+			}
+			return a;
 		}
 	};
 	Ninf mod;
@@ -171,20 +247,20 @@ class inf{
 		}
 	}
 public:
-	std::string tostr(){
+	explicit operator std::string(){
 		std::string e;
 		if (sign==0){
 			e="0";
 		}
 		if (sign==1){
-			e=mod.tostr();
+			e=std::string(mod);
 		}
 		if (sign==-1){
-			e="-"+mod.tostr();
+			e="-"+std::string(mod);
 		}
 		return e;
 	}
-	operator int_least64_t(){
+	explicit operator int_least64_t(){
 		return sign*uint_least64_t(mod);
 	}
 	inline inf(std::string o){
@@ -218,7 +294,6 @@ public:
 		inf a(o);
 		return a;
 	}
-/*
 	friend inline std::ostream& operator<<(std::ostream& os,inf i){
 		os<<std::string(i);
 		return os;
@@ -231,7 +306,11 @@ public:
 		i.norm();
 		return is;
 	}
-*/
+	friend inline inf abs(inf o){
+		inf a=o;
+		a.sign*=-1;
+		return a;
+	}
 	inline inf operator+(){
 		inf a;
 		a.sign=sign;
@@ -309,7 +388,6 @@ public:
 		sign=a.sign;
 		return a;
 	}
-/*
 	inline inf operator-=(inf o){
 		inf a;
 		a=*this-o;
@@ -317,7 +395,6 @@ public:
 		sign=a.sign;
 		return a;
 	}
-*/
 	inline inf operator*=(inf o){
 		inf a;
 		a=*this*o;
@@ -366,6 +443,26 @@ public:
 	}
 	inline inf operator!(){
 		return inf(!sign);
+	}
+	inline inf operator<<(inf o){
+		inf a=*this;
+		if (o>0){
+			a.mod=a.mod<<o.mod;
+		}
+		if (o<0){
+			a.mod=a.mod>>o.mod;
+		}
+		return a;
+	}
+	inline inf operator>>(inf o){
+		inf a=*this;
+		if (o<0){
+			a.mod=a.mod<<o.mod;
+		}
+		if (o>0){
+			a.mod=a.mod>>o.mod;
+		}
+		return a;
 	}
 };
 #ifdef replace_int

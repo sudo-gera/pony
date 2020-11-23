@@ -1,9 +1,7 @@
 #include "inf.hpp"
 #include <bits/stdc++.h>
-//using namespace std;
+using namespace std;
 
 int main(){
-	auto f=inf(8);
-	f=f-inf(4);
-	cout<<f;
+	cout<<inf(3)/inf(4);
 }
