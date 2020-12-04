@@ -1,18 +1,24 @@
-class fraction{
-	int numerator,denominator;
+template <typename T>
+struct fraction_struct{
+	T nu,de;
 	inline norm{
-		while (numerator*denominator){
-			numerator=numerator%denominator;
-			denominator=denominator%numerator;
+		auto n=nu;
+		auto d=de;
+		while (n*d){
+			n=n%d;
+			d=d%n;
 		}
-		return numerator+denominator;
+		auto g=n+d;
+		nu/=g;
+		de/=g;
 	}
-	inline fraction(n=0,d=1){
-		numerator=n;
-		denominator=d;
-		this->norm();
+	friend inline auto operator+=(){
+
 	}
-	inline fraction(long double d){
-		
-	}
+}
+
+template <typename Y>
+auto inline fraction(){
+	fraction_struct<Y> f;
+	return f;
 }
