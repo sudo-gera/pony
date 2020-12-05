@@ -78,7 +78,7 @@ private:
 				n-=1;
 			}
 			a.norm();
-			return a;		
+			return a;
 		}
 		inline int32_t diff(Ninf o){
 			o.norm();
@@ -245,6 +245,7 @@ private:
 		if (sign==-1){
 			return -mod.diff(o.mod);
 		}
+		return 0;
 	}
 public:
 	explicit operator std::string(){
