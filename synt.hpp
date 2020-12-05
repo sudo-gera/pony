@@ -3,22 +3,12 @@ using ___main=old_int;
 #else
 using ___main=int;
 #endif
-#define end_main }
-#define begin_main ___main main(___main _argc,char**_argv){\
-	std::vector<std::string>argv;\
-	{\
-		___main g=0;\
-		while g<_argc do\
-		{\
-			argv.push_back(_argv[g]);\
-			g++;\
-		}\
-	}
+#define pony_wakeup using namespace std;
+#define pony_run void pony()
+#include "funcsynt.hpp"
 #define let auto
 #define var auto
 #define in :
-#define def auto
-#define of :
 #define while while(
 #define do )
 #define if if(

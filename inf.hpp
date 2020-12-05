@@ -3,10 +3,8 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
-class inf{
-private:
+struct inf{
 	struct Ninf{
-	public:
 		std::vector<uint32_t> digits;
 		inline void norm(){
 			while (digits.size() && digits[digits.size()-1]==0){
@@ -89,7 +87,7 @@ private:
 			if (digits.size()>o.digits.size()){
 				return 1;
 			}
-			for (uint_least64_t t=digits.size()-1;t>=0;t--){
+			for (int_least64_t t=digits.size()-1;t>=0;t--){
 				if(digits[t]<o.digits[t]){
 					return -1;
 				}
@@ -118,13 +116,9 @@ private:
 		inline Ninf operator/(Ninf o){
 			Ninf c=1;
 			Ninf a=0;
-			while (digits.size()>o.digits.size()){
+			while (digits.size()>=o.digits.size()){
 				o=o<<(sizeof(int32_t)*8);
 				c=c<<(sizeof(int32_t)*8);
-			}
-			while (this->diff(o)!=-1){
-				c=c<<1;
-				o=o<<1;
 			}
 			while (c.diff(0)){
 				if (this->diff(o)>-1){
@@ -135,27 +129,6 @@ private:
 				o=o>>1;
 			}
 			return a;
-			Ninf b(0);
-			Ninf one(1);
-			Ninf five(1LL<<(8*sizeof(int32_t)-1));
-			Ninf e=this->add(one,1);
-			while ((e.add(b,-1)).diff(one)==1){
-				Ninf c=(e.add(b,1))*five;
-				c.digits=std::vector<uint32_t>(c.digits.begin()+1, c.digits.end());
-				int32_t d=(c*o).diff(*this);
-				if (d==-1){
-					b=c;
-				}
-				if (d==1){
-					e=c;
-				}
-				if (d==0){
-					b=c;
-					e=c;
-				}
-			}
-			b.norm();
-			return b;
 		}
 		inline Ninf operator<<(Ninf o){
 			Ninf a=*this;
@@ -165,7 +138,7 @@ private:
 				r=0;
 			}else if(o.diff(sizeof(int32_t)*8*2)==-1){
 				r=1;
-			}else {
+			}else{
 				r=o/(sizeof(int32_t)*8);
 			}
 			s=uint_least64_t(o.add(r*sizeof(int32_t)*8,-1));
@@ -173,21 +146,22 @@ private:
 				r=digits.size();
 			}
 			auto dig=std::vector<uint32_t>();
-			while (r.diff(0)>0){
-				r.add(1,-1);
-				dig.resize(dig.size()+1);
-			}
+			Ninf zero(0);
+			dig.resize(dig.size()+uint_least64_t(r));
 			dig.insert(dig.end(),a.digits.begin(), a.digits.end());
 			a.digits=dig;
-			int_least64_t t=0;
-			int32_t y=0;
+			a.digits.resize(a.digits.size()+1);
+			uint_least64_t t=0;
+			uint32_t y=0;
 			for(auto d=a.digits.begin();d!=a.digits.end();d++){
-				t=(int_least64_t)(*d);
+				t=(uint_least64_t)(*d);
 				t<<=s;
 				*d=t;
 				*d+=y;
 				y=t>>(sizeof(int32_t)*8);
 			}
+
+			a.norm();
 			return a;
 		}
 		inline Ninf operator>>(Ninf o){
@@ -198,7 +172,7 @@ private:
 				r=0;
 			}else if(o.diff(sizeof(int32_t)*8*2)==-1){
 				r=1;
-			}else {
+			}else{
 				r=o/(sizeof(int32_t)*8);
 			}
 			s=uint_least64_t(o.add(r*sizeof(int32_t)*8,-1));
@@ -206,10 +180,10 @@ private:
 				r=digits.size();
 			}
 			a.digits=std::vector<uint32_t>(a.digits.begin()+uint_least64_t(r),a.digits.end());
-			int_least64_t t=0;
-			int32_t y=0;
+			uint_least64_t t=0;
+			uint32_t y=0;
 			for(auto d=a.digits.rbegin();d!=a.digits.rend();d++){
-				t=(int_least64_t)(*d)<<(sizeof(int32_t)*8);
+				t=(uint_least64_t)(*d)<<(sizeof(int32_t)*8);
 				t>>=s;
 				*d=t>>(sizeof(int32_t)*8);
 				*d+=y;
@@ -225,8 +199,8 @@ private:
 		Ninf zero(0);
 		if (mod.diff(zero)==0){
 			sign=0;
-		}else if(sign==0){
-			sign=1;
+		} else if(sign==0){
+			mod=zero;
 		}
 	}
 	inline int32_t diff(inf o){
@@ -245,9 +219,12 @@ private:
 		if (sign==-1){
 			return -mod.diff(o.mod);
 		}
+<<<<<<< HEAD
 		return 0;
+=======
+		return 0; 
+>>>>>>> 9c56e5dbe9c4e246a13643618fdf331f886e8d40
 	}
-public:
 	explicit operator std::string(){
 		std::string e;
 		if (sign==0){
@@ -263,6 +240,9 @@ public:
 	}
 	explicit operator int_least64_t(){
 		return sign*uint_least64_t(mod);
+	}
+	explicit operator bool(){
+		return bool(sign);
 	}
 	inline inf(std::string o){
 		sign=1;
@@ -318,19 +298,19 @@ public:
 		a.mod=mod;
 		return a;
 	}
-	inline inf operator+(inf o){
+	friend inline inf operator+(inf s,inf o){
 		inf a;
-		if (sign==o.sign){
-			a.mod=mod.add(o.mod,1);
-			a.sign=sign;
+		if (s.sign==o.sign){
+			a.mod=s.mod.add(o.mod,1);
+			a.sign=s.sign;
 		}
 		else{
-			int32_t d=mod.diff(o.mod);
+			int32_t d=s.mod.diff(o.mod);
 			if (d==1){
-				a.mod=mod.add(o.mod,-1);
-				a.sign=sign;
+				a.mod=s.mod.add(o.mod,-1);
+				a.sign=s.sign;
 			}else if (d==-1){
-				a.mod=o.mod.add(mod,-1);
+				a.mod=o.mod.add(s.mod,-1);
 				a.sign=o.sign;
 			}else{
 				a=inf(0);
@@ -344,77 +324,135 @@ public:
 		a.sign=-sign;
 		return a;
 	}
-	inline inf operator-(inf o){
-		return *this+(-o);
+	friend inline inf operator-(inf s,inf o){
+		return s+(-o);
 	}
-	inline bool operator<(inf o){
-		return this->diff(o)==-1;
+	friend inline bool operator<(inf s,inf o){
+		return s.diff(o)==-1;
 	}
-	inline bool operator>(inf o){
-		return this->diff(o)==1;
+	friend inline bool operator>(inf s,inf o){
+		return s.diff(o)==1;
 	}
-	inline bool operator==(inf o){
-		return this->diff(o)==0;
+	friend inline bool operator==(inf s,inf o){
+		return s.diff(o)==0;
 	}
-	inline bool operator<=(inf o){
-		return this->diff(o)!=1;
+	friend inline bool operator<=(inf s,inf o){
+		return s.diff(o)!=1;
 	}
-	inline bool operator>=(inf o){
-		return this->diff(o)!=-1;
+	friend inline bool operator>=(inf s,inf o){
+		return s.diff(o)!=-1;
 	}
-	inline bool operator!=(inf o){
-		return this->diff(o)!=0;
+	friend inline bool operator!=(inf s,inf o){
+		return s.diff(o)!=0;
 	}
-	inline inf operator*(inf o){
+	friend inline inf operator*(inf s,inf o){
 		inf a;
-		a.mod=mod*o.mod;
-		a.sign=sign*o.sign;
+		a.mod=s.mod*o.mod;
+		a.sign=s.sign*o.sign;
 		a.norm();
 		return a;
 	}
-	inline inf operator/(inf o){
+	friend inline inf operator/(inf s,inf o){
 		inf a;
-		a.sign=sign/o.sign;
-		a.mod=mod/o.mod;
+		a.sign=s.sign/o.sign;
+		a.mod=s.mod/o.mod;
 		a.norm();
 		return a;
 	}
-	inline inf operator%(inf o){
-		return *this-*this/o*o;
+	friend inline inf operator%(inf s,inf o){
+		return s-s/o*o;
 	}
-	inline inf operator+=(inf o){
-		inf a;
-		a=*this+o;
-		mod=a.mod;
-		sign=a.sign;
+	inline inf operator~(){
+		return inf(-1)-*this;
+	}
+	inline inf operator!(){
+		return inf(!sign);
+	}
+	friend inline inf operator<<(inf s,inf o){
+		inf a=s;
+		if (o>0){
+			a.mod=a.mod<<o.mod;
+		}
+		if (o<0){
+			a.mod=a.mod>>o.mod;
+		}
 		return a;
 	}
-	inline inf operator-=(inf o){
-		inf a;
-		a=*this-o;
-		mod=a.mod;
-		sign=a.sign;
+	friend inline inf operator>>(inf s,inf o){
+		inf a=s;
+		if (o<0){
+			a.mod=a.mod<<o.mod;
+		}
+		if (o>0){
+			a.mod=a.mod>>o.mod;
+		}
 		return a;
 	}
-	inline inf operator*=(inf o){
-		inf a;
-		a=*this*o;
-		mod=a.mod;
-		sign=a.sign;
+	friend inline inf operator&(inf s,inf o){
+		inf a=s;
+		while (a.mod.digits.size()>o.mod.digits.size()){
+			o.mod.digits.push_back(0);
+		}
+		while (a.mod.digits.size()<o.mod.digits.size()){
+			a.mod.digits.push_back(0);
+		}
+		for (uint_least64_t f=0;f<o.mod.digits.size();f++){
+			a.mod.digits[f]&=o.mod.digits[f];
+		}
+		a.norm();
 		return a;
 	}
-	inline inf operator/=(inf o){
-		inf a;
-		a=*this/o;
-		mod=a.mod;
-		sign=a.sign;
+	friend inline inf operator^(inf s,inf o){
+		inf a=s;
+		while (a.mod.digits.size()>o.mod.digits.size()){
+			o.mod.digits.push_back(0);
+		}
+		while (a.mod.digits.size()<o.mod.digits.size()){
+			a.mod.digits.push_back(0);
+		}
+		for (uint_least64_t f=0;f<o.mod.digits.size();f++){
+			a.mod.digits[f]^=o.mod.digits[f];
+		}
+		a.norm();
 		return a;
 	}
-	inline inf operator%=(inf o){
-		inf a;
-		a=*this%o;
-		mod=a.mod;
-		sign=a.sign;
+	friend inline inf operator|(inf s,inf o){
+		inf a=s;
+		while (a.mod.digits.size()>o.mod.digits.size()){
+			o.mod.digits.push_back(0);
+		}
+		while (a.mod.digits.size()<o.mod.digits.size()){
+			a.mod.digits.push_back(0);
+		}
+		for (uint_least64_t f=0;f<o.mod.digits.size();f++){
+			a.mod.digits[f]|=o.mod.digits[f];
+		}
+		a.norm();
+		return a;
+	}
+	friend inline inf operator+=(inf& s,inf o){
+		s=s+o;
+		auto a=s;
+		return a;
+	}
+	friend inline inf operator-=(inf& s,inf o){
+		s=s-o;
+		auto a=s;
+		return a;
+	}
+	friend inline inf operator*=(inf& s,inf o){
+		s=s*o;
+		auto a=s;
+		return a;
+	}
+	friend inline inf operator/=(inf& s,inf o){
+		s=s/o;
+		auto a=s;
+		return a;
+	}
+	friend inline inf operator%=(inf& s,inf o){
+		s=s%o;
+		auto a=s;
 		return a;
 	}
 	inline inf operator++(){
@@ -435,34 +473,29 @@ public:
 		*this-=1;
 		return a;
 	}
-	inline inf operator~(){
-		inf a=*this;
-		for (auto& o:mod.digits){
-			o=~o;
-		}
+	friend inline inf operator&=(inf& s,inf o){
+		s=s&o;
+		auto a=s;
 		return a;
 	}
-	inline inf operator!(){
-		return inf(!sign);
-	}
-	inline inf operator<<(inf o){
-		inf a=*this;
-		if (o>0){
-			a.mod=a.mod<<o.mod;
-		}
-		if (o<0){
-			a.mod=a.mod>>o.mod;
-		}
+	friend inline inf operator^=(inf& s,inf o){
+		s=s^o;
+		auto a=s;
 		return a;
 	}
-	inline inf operator>>(inf o){
-		inf a=*this;
-		if (o<0){
-			a.mod=a.mod<<o.mod;
-		}
-		if (o>0){
-			a.mod=a.mod>>o.mod;
-		}
+	friend inline inf operator|=(inf& s,inf o){
+		s=s|o;
+		auto a=s;
+		return a;
+	}
+	friend inline inf operator>>=(inf& s,inf o){
+		s=s>>o;
+		auto a=s;
+		return a;
+	}
+	friend inline inf operator<<=(inf& s,inf o){
+		s=s<<o;
+		auto a=s;
 		return a;
 	}
 };

@@ -1,10 +1,11 @@
 #ifndef other_int
-#define other_int int
+	#define other_int int
 #endif
-struct range{
+template <typename T>
+struct range_struct{
 	struct range_iterator{
-		other_int val, step;
-		inline range_iterator(other_int v,other_int s){
+		T val, step;
+		inline range_iterator(T v,T s){
 			val=v;
 			step=s;
 		}
@@ -23,29 +24,11 @@ struct range{
 		inline void operator++(){
 			val+=step;
 		}
-		inline other_int operator*(){
+		inline T operator*(){
 			return val;
 		}
 	};
-	other_int start, stop, step;
-	inline range(other_int a,other_int o,other_int e=1){
-		start=a;
-		stop=o;
-		step=e;
-	}
-	inline range(other_int o){
-		start=0;
-		stop=o;
-		step=1;
-	}
-	friend inline range range(other_int a,other_int o,other_int e=1){
-		range r(a,o,e);
-		return r;
-	}
-	friend inline range range(other_int o){
-		range r(0,o,1);
-		return r;
-	}
+	T start, stop, step;
 	inline range_iterator begin(){
 		range_iterator r(start,step);
 		return r;
@@ -55,3 +38,19 @@ struct range{
 		return r;
 	}
 };
+template <typename Y>
+	inline auto range(Y a,Y o,Y e=1){
+		range_struct<Y> r;
+		r.start=a;
+		r.stop=o;
+		r.step=e;
+		return r;
+	}
+template <typename Y>
+	inline auto range(Y o){
+		range_struct<Y> r;
+		r.start=0;
+		r.stop=o;
+		r.step=1;
+		return r;
+	}
