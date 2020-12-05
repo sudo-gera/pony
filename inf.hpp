@@ -221,11 +221,7 @@ struct inf{
 		if (sign==-1){
 			return -mod.diff(o.mod);
 		}
-<<<<<<< HEAD
 		return 0;
-=======
-		return 0; 
->>>>>>> 9c56e5dbe9c4e246a13643618fdf331f886e8d40
 	}
 	explicit operator std::string(){
 		std::string e;
@@ -511,7 +507,6 @@ struct inf{
 	using old_int = int;
 	#define int inf
 #endif
-<<<<<<< HEAD
 struct boost_inf{
 	int_least64_t sval;
 	bool longer;
@@ -581,5 +576,3 @@ struct boost_inf{
 	friend inline boost_inf operator-(boost_inf s){
 	}
 };
-=======
->>>>>>> af5864ee6401e0873b625dfd3d5a21b563fc2c90
