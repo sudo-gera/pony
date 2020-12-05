@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
+#include <limits>
 struct inf{
 	struct Ninf{
 		std::vector<uint32_t> digits;
@@ -193,6 +194,7 @@ struct inf{
 		}
 	};
 	Ninf mod;
+	int_least64_t val;
 	int32_t sign;
 	inline void norm(){
 		mod.norm();
@@ -257,11 +259,17 @@ struct inf{
 	};
 	inline inf(int_least64_t o){
 		sign=(!!o)*(o<0?-1:1);
+		int32_t m=0;
+		if (o==INT_MIN){
+			m=1;
+			o+=1;
+		}
 		if (o<0){
 			o=-o;
 		}
 		Ninf t(o);
 		mod=t;
+		*this-=m;
 	}
 	friend inline inf inf(std::string o){
 		inf a(o);
@@ -499,3 +507,72 @@ struct inf{
 	using old_int = int;
 	#define int inf
 #endif
+struct boost_inf{
+	int_least64_t sval;
+	bool longer;
+	inf lval;
+	inline boost_inf(): sval(0), longer(0), lval(0){}
+	inline boost_inf(int_least64_t a): sval(a), longer(0), lval(0){}
+	inline boost_inf(int_least64_t a,bool s,inf d): sval(a), longer(s), lval(d){}
+	inline boost_inf(inf d): sval(0), longer(0), lval(d){}
+	#define lop(s,n,o)  boost_inf(0,1,(s.longer?s.lval:inf(s.sval)) n (o.longer?o.lval:inf(o.sval)))
+	#define sop(s,n,o)  boost_inf(int_least64_t((s.longer?s.lval:inf(s.sval)) n (o.longer?o.lval:inf(o.sval))),0,0)
+	#define ssop(s,n,o) boost_inf(s.sval n o.sval,0,0)
+	friend inline boost_inf operator+(boost_inf s,boost_inf o){
+		return
+			o.sval<0 || LLONG_MAX-o.sval>=s.sval?
+				o.sval>0 || LLONG_MIN-o.sval<=s.sval?
+					s.longer==0&&o.longer==0?
+						ssop(s,+,o)
+					:
+						sop(s,+,o)
+				:
+					lop(s,+,o)
+			:
+				lop(s,+,o);
+	}
+	friend inline boost_inf operator-(boost_inf s,boost_inf o){
+		return
+			s.sval<0 || LLONG_MAX-s.sval>=-o.sval?
+				s.sval>0 || LLONG_MIN-s.sval<=-o.sval?
+					s.longer==0&&o.longer==0?
+						ssop(s,-,o)
+					:
+						sop(s,-,o)
+				:
+					lop(s,-,o)
+			:
+				lop(s,-,o);
+	}
+	friend inline boost_inf operator*(boost_inf s,boost_inf o){
+		return
+			s.sval<0 || o.sval<0 || LLONG_MAX/s.sval>=o.sval?
+				s.sval>0 || o.sval<0 || LLONG_MAX/(-s.sval)>=o.sval?
+					s.sval<0 || o.sval>0 || LLONG_MAX/s.sval>=-o.sval?
+						s.sval>0 || o.sval>0 || LLONG_MAX/s.sval<=o.sval?
+							s.longer==0&&o.longer==0?
+								ssop(s,*,o)
+							:
+								sop(s,*,o)
+						:
+							lop(s,*,o)
+					:
+						lop(s,*,o)
+				:
+					lop(s,*,o)
+			:
+				lop(s,*,o);
+	}
+	friend inline boost_inf operator/(boost_inf s,boost_inf o){
+		return
+			s.longer==0&&o.longer==0?
+				ssop(s,/,o)
+			:
+				lop(s,/,o).lval>LLONG_MIN && lop(s,/,o).lval<LLONG_MAX?
+					sop(s,/,o)
+				:
+					lop(s,/,o);
+	}
+	friend inline boost_inf operator-(boost_inf s){
+	}
+};
