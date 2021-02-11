@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #include "inf.hpp"
 //#include <bits/stdc++.h>
 #include <iostream>
@@ -8,7 +7,6 @@ int main(){
 	auto d=inf(3)<<inf(4);
 	cout<<int64_t(d);
 }
-=======
 #include "pony.hpp"
 pony_wakeup
 
