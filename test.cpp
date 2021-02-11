@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #include "inf.hpp"
 //#include <bits/stdc++.h>
 #include <iostream>
@@ -7,17 +8,13 @@ int main(){
 	auto d=inf(3)<<inf(4);
 	cout<<int64_t(d);
 }
+=======
+>>>>>>> 66e3ba6e09122b8dcf3e8d54114571db7e68aca8
 #include "pony.hpp"
 pony_wakeup
+#pragma GCC optimize("Ofast")
 
 pony_run{
-	let s=vector<int>({1,2,3,4,5,6,7,8,9});;
-	let f=frag(s,2,-2);
-	for w in f do{
-		cout<<w;
-	}
-	for w in s do{
-		cout<<w;
-	}
+	let s=inf::Zinf("1234567890987654321"),d=inf::Zinf("1234567890987654321");
+	cout<<inf::Zinf(s+d);
 }
->>>>>>> 9c56e5dbe9c4e246a13643618fdf331f886e8d40

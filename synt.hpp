@@ -12,8 +12,7 @@ using ___main=int;
 #define while while(
 #define do )
 #define if if(
-#define elif else if(
-#define else else(
+#define elif else if
 #define for for(auto 
 #define str string
 #ifdef inf_included
