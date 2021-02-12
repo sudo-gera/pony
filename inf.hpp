@@ -4,6 +4,8 @@
 #include <iostream>
 #include <algorithm>
 #include <limits>
+//using namespace std;
+//#define log(q) std::cout<<#q;for (auto gg:(q).digits){std::cout<<' '<<gg;}cout<<'\n';
 struct inf{
 	struct Zinf{
 		struct Ninf{
@@ -11,6 +13,33 @@ struct inf{
 			inline void norm(){
 				while (digits.size() && digits[digits.size()-1]==0){
 					digits.pop_back();
+	struct Ninf{
+		std::vector<uint32_t> digits;
+		inline void norm(){
+			while (digits.size() && digits[digits.size()-1]==0){
+				digits.pop_back();
+			}
+		}
+		explicit operator uint_least64_t(){
+			uint_least64_t f=0;
+			for (uint_least64_t i=0;i<digits.size() and i<sizeof(uint_least64_t)/sizeof(int32_t);i++){
+				f+=(uint_least64_t)(digits[i])<<(sizeof(int32_t)*8*i);
+			}
+			return f;
+		}
+		explicit operator std::string(){
+			std::string e;
+			Ninf t=*this;
+			Ninf m,n;
+			Ninf zero(0);
+			Ninf ten(10);
+			while (t.diff(zero)){
+				n=t/ten;
+				m=(t.add(n*ten,-1));
+				if (m.digits.size()){
+					e.push_back(m.digits[0]+'0');
+				}else{
+					e.push_back('0');
 				}
 			}
 			explicit operator std::string(){
@@ -24,6 +53,39 @@ struct inf{
 					m=(t.add(n*ten,-1));
 					if (m.digits.size()){
 						e.push_back(m.digits[0]+'0');
+			reverse(e.begin(), e.end());
+			return e;
+		}
+		inline Ninf(uint_least64_t o){
+			digits.clear();
+			while (o){
+				digits.push_back(o);
+				o>>=8*sizeof(int32_t);
+			}
+		}
+		inline Ninf(std::string o){
+			digits.clear();
+			Ninf dp(1);
+			Ninf ten(10);
+			reverse(o.begin(), o.end());
+			for (uint_least64_t i=0;i<o.size();i++){
+				Ninf t(o[i]-'0');
+				*this=this->add(t*dp,1);
+				dp=dp*ten;
+			}
+		}
+		inline Ninf(){};
+		inline Ninf add(Ninf o,int32_t s){
+			Ninf a;
+			uint_least64_t n=0;
+			for (uint_least64_t t=0; t<digits.size() || t<o.digits.size() || n; t++){
+				n+=1LL<<(sizeof(int32_t)*8);
+				if (t<digits.size()){
+					n+=digits[t];
+				}
+				if (t<o.digits.size()){
+					if (s>0){
+						n+=o.digits[t];
 					}else{
 						e.push_back('0');
 					}
@@ -319,7 +381,23 @@ struct inf{
 			}
 			if (o.diff(0)<0){
 				a.mod=a.mod<<o.mod;
+		inline Ninf operator/(Ninf o){
+			Ninf t=*this;
+			Ninf c=1;
+			Ninf a=0;
+			while (t.digits.size()>=o.digits.size()){
+				o=o<<(sizeof(int32_t)*8);
+				c=c<<(sizeof(int32_t)*8);
 			}
+			while (c.diff(0)){
+				if (t.diff(o)>-1){
+					t=t.add(o,-1);
+					a=a.add(c,1);
+				}
+				c=c>>1;
+				o=o>>1;
+			}
+			a.norm();
 			return a;
 		}
 		friend inline Zinf operator&(Zinf s,Zinf o){
@@ -415,6 +493,28 @@ struct inf{
 	}
 	explicit operator std::string(){
 		return longer?std::string(lval):std::to_string(sval);
+	inline inf(){
+		sign=0;
+	};
+	inline inf(int_least64_t o){
+		sign=(!!o)*(o<0?-1:1);
+/*		int32_t m=0;
+		if (o==INT_MIN){
+			m=1;
+			o+=1;
+		}
+*/
+		if (o<0){
+			o=-o;
+		}
+		Ninf t(o);
+		mod=t;
+//		*this-=m;
+	}
+	friend inline inf inf(std::string o){
+		inf a(o);
+		return a;
+>>>>>>> noboost
 	}
 	explicit operator int_least64_t(){
 		return longer?int_least64_t(lval):sval;	
