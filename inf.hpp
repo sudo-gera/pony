@@ -4,6 +4,8 @@
 #include <iostream>
 #include <algorithm>
 #include <limits>
+//using namespace std;
+//#define log(q) std::cout<<#q;for (auto gg:(q).digits){std::cout<<' '<<gg;}cout<<'\n';
 struct inf{
 	struct Ninf{
 		std::vector<uint32_t> digits;
@@ -11,6 +13,13 @@ struct inf{
 			while (digits.size() && digits[digits.size()-1]==0){
 				digits.pop_back();
 			}
+		}
+		explicit operator uint_least64_t(){
+			uint_least64_t f=0;
+			for (uint_least64_t i=0;i<digits.size() and i<sizeof(uint_least64_t)/sizeof(int32_t);i++){
+				f+=(uint_least64_t)(digits[i])<<(sizeof(int32_t)*8*i);
+			}
+			return f;
 		}
 		explicit operator std::string(){
 			std::string e;
@@ -30,13 +39,6 @@ struct inf{
 			}
 			reverse(e.begin(), e.end());
 			return e;
-		}
-		explicit operator uint_least64_t(){
-			uint_least64_t f=0;
-			for (uint_least64_t i=0;i<digits.size() and i<sizeof(uint_least64_t)/sizeof(int32_t);i++){
-				f+=(uint_least64_t)(digits[i])<<(sizeof(int32_t)*8*i);
-			}
-			return f;
 		}
 		inline Ninf(uint_least64_t o){
 			digits.clear();
@@ -115,20 +117,22 @@ struct inf{
 			return a;
 		}
 		inline Ninf operator/(Ninf o){
+			Ninf t=*this;
 			Ninf c=1;
 			Ninf a=0;
-			while (digits.size()>=o.digits.size()){
+			while (t.digits.size()>=o.digits.size()){
 				o=o<<(sizeof(int32_t)*8);
 				c=c<<(sizeof(int32_t)*8);
 			}
 			while (c.diff(0)){
-				if (this->diff(o)>-1){
-					*this=this->add(o,-1);
+				if (t.diff(o)>-1){
+					t=t.add(o,-1);
 					a=a.add(c,1);
 				}
 				c=c>>1;
 				o=o>>1;
 			}
+			a.norm();
 			return a;
 		}
 		inline Ninf operator<<(Ninf o){
@@ -190,6 +194,7 @@ struct inf{
 				*d+=y;
 				y=t;
 			}
+			a.norm();
 			return a;
 		}
 	};
@@ -259,17 +264,18 @@ struct inf{
 	};
 	inline inf(int_least64_t o){
 		sign=(!!o)*(o<0?-1:1);
-		int32_t m=0;
+/*		int32_t m=0;
 		if (o==INT_MIN){
 			m=1;
 			o+=1;
 		}
+*/
 		if (o<0){
 			o=-o;
 		}
 		Ninf t(o);
 		mod=t;
-		*this-=m;
+//		*this-=m;
 	}
 	friend inline inf inf(std::string o){
 		inf a(o);
@@ -507,6 +513,7 @@ struct inf{
 	using old_int = int;
 	#define int inf
 #endif
+/*
 struct boost_inf{
 	int_least64_t sval;
 	bool longer;
@@ -576,3 +583,4 @@ struct boost_inf{
 	friend inline boost_inf operator-(boost_inf s){
 	}
 };
+*/

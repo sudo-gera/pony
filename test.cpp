@@ -1,7 +1,11 @@
-#include "pony.hpp"
-pony_wakeup
+#include "inf.hpp"
+using namespace std;
+inf gcd(inf a,inf s){
+	return a!=0?gcd(s%a,a):s;
+}
 
-pony_run{
-	inf s;
-//	cout<<s<<endl;
+int main(){
+	inf g,h;
+	cin>>g>>h;
+	cout<<gcd(g,h);
 }
