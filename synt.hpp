@@ -8,6 +8,8 @@ using ___main=int;
 #include "funcsynt.hpp"
 #define let auto
 #define var auto
+#define len(q) q.size()
+#define append push_back
 #define in :
 #define while while(
 #define do )
@@ -32,14 +34,8 @@ ___main main(___main _argc,char**_argv){
 	return 0;
 }
 
-#define print(...) print_f(__VA_ARGS__);
-template <typename... t>
-void print_f(t... a){
-	int dummy[sizeof...(t)] = { (std::cout<<a<<' ', 0)... };
-	std::cout<<std::endl;
-}
 
-
+#define scan(t) scan_f<t>()
 template <typename t>
 t scan_f(){
 	t q;
@@ -47,7 +43,12 @@ t scan_f(){
 	return q;
 }
 
-#define scan(t) scan_f<t>()
+#define print(...) print_f(__VA_ARGS__);
+template <typename... t>
+void print_f(t... a){
+	int dummy[sizeof...(t)] = { (std::cout<<a<<' ', 0)... };
+	std::cout<<std::endl;
+}
 
 #define print_nn(...) print_nn_f(__VA_ARGS__);
 template <typename... t>
@@ -63,6 +64,17 @@ std::vector<t> vect_funct(std::initializer_list<t> a){
 	return s;
 }
 
-#define empty_vect(t) vector<t>()
+#define vect_by_val(t) vector<decltype(t)>()
+#define vect_by_type(t) vector<t>()
+
+
+
+
+
+
+
+
+
+
 
 
