@@ -1,38 +1,17 @@
 #include "pony.hpp"
 pony_wakeup
 
-def1(eiler_func,f){
-	let res=f;
-	let p=2;
-	if f%p==0 do{
-		res=res*(p-1)/p;
-		while f%p==0 do{
-			f/=p;
-		}
+def2(a,m,n){
+	if m==0 do{
+		return n+1;
 	}
-	p=3;
-	while p*p<=f do{
-		if f%p==0 do{
-			res=res*(p-1)/p;
-			while f%p==0 do{
-				f/=p;
-			}
-		}
-		p+=2;
+	if n==0 do{
+		return a(m-1,1);
 	}
-	if f>1 do{
-		p=f;
-		if f%p==0 do{
-			res=res*(p-1)/p;
-			while f%p==0 do{
-				f/=p;
-			}
-		}
-	}
-	return res;
+	return a(m-1,a(m,n-1));
+
 }
 
-
 pony_run{
-	print(eiler_func(scan(int)))
+	print(a(scan(int),scan(int)))
 }
