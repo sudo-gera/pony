@@ -1,6 +1,6 @@
 #define stl(a) a.begin(),a.end()
 template <typename T>
-auto frag(T a,int_least64_t s=0,int_least64_t d=0){
+T frag(T a,int_least64_t s=0,int_least64_t d=0){
 	auto f=a.size();
 	if (s>f){
 		s=f;

@@ -39,7 +39,7 @@ struct range_struct{
 	}
 };
 template <typename Y>
-	inline auto range(Y a,Y o,Y e=1){
+	inline range_struct<Y> range(Y a,Y o,Y e=1){
 		range_struct<Y> r;
 		r.start=a;
 		r.stop=o;
@@ -47,7 +47,7 @@ template <typename Y>
 		return r;
 	}
 template <typename Y>
-	inline auto range(Y o){
+	inline range_struct<Y> range(Y o){
 		range_struct<Y> r;
 		r.start=0;
 		r.stop=o;

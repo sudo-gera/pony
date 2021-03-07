@@ -27,14 +27,42 @@ std::vector<std::string>argv;
 void pony();
 
 ___main main(___main _argc,char**_argv){
-	{
-		___main g=0;
-		while g<_argc do
-		{
-			argv.push_back(_argv[g]);
-			g++;
-		}
-	}
+	argv=decltype(argv)(_argv,_argv+_argc);
 	pony();
 	return 0;
 }
+
+#define print(...) print_f(__VA_ARGS__);
+template <typename... t>
+void print_f(t... a){
+	int dummy[sizeof...(t)] = { (std::cout<<a<<' ', 0)... };
+	std::cout<<std::endl;
+}
+
+
+template <typename t>
+t scan_f(){
+	t q;
+	std::cin>>q;
+	return q;
+}
+
+#define scan(t) scan_f<t>()
+
+#define print_nn(...) print_nn_f(__VA_ARGS__);
+template <typename... t>
+void print_nn_f(t... a){
+	int dummy[sizeof...(t)] = { (std::cout<<a<<' ', 0)... };
+}
+
+
+#define vect(...) vect_funct({__VA_ARGS__})
+template <typename t>
+std::vector<t> vect_funct(std::initializer_list<t> a){
+	std::vector<t> s(a.begin(),a.end());
+	return s;
+}
+
+#define empty_vect(t) vector<t>()
+
+
