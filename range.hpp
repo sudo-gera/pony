@@ -1,6 +1,3 @@
-#ifndef other_int
-	#define other_int int
-#endif
 template <typename T>
 struct range_struct{
 	struct range_iterator{
@@ -39,11 +36,19 @@ struct range_struct{
 	}
 };
 template <typename Y>
-	inline range_struct<Y> range(Y a,Y o,Y e=1){
+	inline range_struct<Y> range(Y a,Y o,Y e){
 		range_struct<Y> r;
 		r.start=a;
 		r.stop=o;
 		r.step=e;
+		return r;
+	}
+template <typename Y>
+	inline range_struct<Y> range(Y a,Y o){
+		range_struct<Y> r;
+		r.start=a;
+		r.stop=o;
+		r.step=1;
 		return r;
 	}
 template <typename Y>

@@ -16,7 +16,9 @@ using ___main=int;
 #define if if(
 #define elif else if
 #define for for(auto 
-#define str string
+#define str_t string
+#define int int64_t
+#define float (long double)
 #ifdef inf_included
 	using long_int=inf;
 #else
@@ -46,16 +48,16 @@ t scan_f(){
 #define print(...) print_f(__VA_ARGS__);
 template <typename... t>
 void print_f(t... a){
-	int dummy[sizeof...(t)] = { (std::cout<<a<<' ', 0)... };
+	int y=sizeof...(t);
+	int dummy[sizeof...(t)] = { (std::cout<<a<<((--y)?" ":""), 0)... };
 	std::cout<<std::endl;
 }
 
-#define print_nn(...) print_nn_f(__VA_ARGS__);
+#define write(...) print_nn_f(__VA_ARGS__);
 template <typename... t>
 void print_nn_f(t... a){
-	int dummy[sizeof...(t)] = { (std::cout<<a<<' ', 0)... };
+	int dummy[sizeof...(t)] = { (std::cout<<a, 0)... };
 }
-
 
 #define vect(...) vect_funct({__VA_ARGS__})
 template <typename t>
@@ -67,10 +69,16 @@ std::vector<t> vect_funct(std::initializer_list<t> a){
 #define vect_by_val(t) vector<decltype(t)>()
 #define vect_by_type(t) vector<t>()
 
+template<typename t>
+std::string str(t q){
+	std::stringstream s;
+	s<<q;
+	return s.str();
+}
 
-
-
-
+std::string str(){
+	return std::string();
+}
 
 
 

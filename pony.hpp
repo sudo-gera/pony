@@ -3,6 +3,7 @@
 //	#define replace_int
 //#endif
 //#include "inf.hpp"
+#include "str.hpp"
 #include "frag.hpp"
 #include "range.hpp"
 #include "synt.hpp"
