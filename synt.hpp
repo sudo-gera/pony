@@ -55,16 +55,16 @@ std::u32string str(){
 
 #define to_make_str(type,code) std::u32string str(type orig){let s=std::stringstream();code;return to_u32(s.str());}
 
-// to_make_str(const int8_t,s<<orig)
-// to_make_str(const int16_t,s<<orig)
-// to_make_str(const int32_t,s<<orig)
+to_make_str(const int8_t,s<<int(orig))
+to_make_str(const int16_t,s<<orig)
+to_make_str(const int32_t,s<<orig)
 to_make_str(const int64_t,s<<orig)
-// to_make_str(const char,let d=str();d.push_back(char32_t(orig));s<<to_u8(d))
-// to_make_str(const char16_t,let d=str();d.push_back(char32_t(orig));s<<to_u8(d))
+to_make_str(const char,let d=str();d.push_back(char32_t(orig));s<<to_u8(d))
+to_make_str(const char16_t,let d=str();d.push_back(char32_t(orig));s<<to_u8(d))
 to_make_str(const char32_t,let d=str();d.push_back(char32_t(orig));s<<to_u8(d))
 to_make_str(const bool,s<<(orig?"True":"False"))
 to_make_str(const char *,s<<orig)
-//to_make_str(float,s<<orig)
+// to_make_str(float,s<<orig)
 to_make_str(const std::string,s<<orig)
 to_make_str(const std::u32string,s<<to_u8(orig))
 
