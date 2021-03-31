@@ -16,9 +16,10 @@ using ___main=int;
 #define if if(
 #define elif else if
 #define for for(auto 
-typedef std::string str_t;
+typedef std::u32string str_t;
 #define int int64_t
 #define float (long double)
+#define type(q) decltype(q())
 #ifdef inf_included
 	using long_int=inf;
 #else
@@ -71,14 +72,23 @@ to_make_str(const std::u32string,s<<to_u8(orig))
 template<typename t>
 to_make_str(std::vector<t>,s<<"[";let y=len(orig);for w in orig do{s<<w<<((--y)?", ":"");};s<<"]";)
 
-#define scan(t) scan_f<t>()
-
-template <auto t>
-auto scan_f(){
+/*#define scan(t) scan_from_type<t>()
+template <typename t>
+auto scan_from_type(){
 	let q=t();
 	std::cin>>q;
 	return q;
-}
+}*/
+
+#define scan(t) scan_f(t())
+#define to_make_scan(type,code) auto scan_f(type orig){code;return orig;}
+
+to_make_scan(int64_t,std::cin>>orig)
+to_make_scan(char,std::cin>>orig)
+to_make_scan(str_t,let d=std::string();std::cin>>d;orig=to_u32(d))
+to_make_scan(std::string,std::cin>>orig)
+// to_make_scan(float,std::cin>>orig)
+
 
 
 #define print(...) print_f(__VA_ARGS__);
