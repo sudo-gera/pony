@@ -15,24 +15,8 @@ def1(tobin,f){
 
 
 pony_run{
-	let a=str("¡™£¢∞§¶•ªºœ∑´®†¥¨ˆøπ“‘åß∂ƒ©˙∆˚¬…æђxcvіƒm≤≥їјџўќ†њѓѕ'‘“«dzћ÷…•∆љl«єђxcvіƒm≤≥ї");
-	print(a)
-	let x=0;
-	for w in a do{
-		if ++x%2 do{
-			write(w);
-		}else{
-			write(" ");
-		}
-	}
-	print();
-	x=1;
-	for w in a do{
-		if ++x%2 do{
-			write(w);
-		}else{
-			write(" ");
-		}
-	}
-	print();
+	print(1)
+	print(1L)
+	print(1LL)
+
 }
