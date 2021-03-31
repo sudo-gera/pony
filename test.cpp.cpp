@@ -17,14 +17,5 @@ def1(tobin,f){
 
 
 pony_run{
-	print(49L);
-	print(int8_t(49));
-	print(int16_t(49));
-	print(int32_t(49));
-	print(int64_t(49));
-	print(char(49));
-	print(char16_t(49));
-	print(char32_t(49));
-	print(bool(49));
-
+	let a=scan(str)
 }
