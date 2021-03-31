@@ -1,6 +1,7 @@
 #include "/Users/gera/pony/pony.hpp"
 using namespace std;
-def1(tobin,q){
+def1(tobin,f){
+	let q=int32_t(f);
 	let res=str();
 	let c=int(0);
 	for w in range(int(sizeof(q)*8-1),int(-1),int(-1)) do{
@@ -16,17 +17,24 @@ def1(tobin,q){
 
 
 pony_run{
-	let q=int(4036005256);
-	print(tobin(q));
-	print(tobin(ord(q)));
-/*	let a=str("абвг");
-	let d=int();
+	let a=str("¡™£¢∞§¶•ªºœ∑´®†¥¨ˆøπ“‘åß∂ƒ©˙∆˚¬…æђxcvіƒm≤≥їјџўќ†њѓѕ'‘“«dzћ÷…•∆љl«єђxcvіƒm≤≥ї");
+	print(a)
+	let x=0;
 	for w in a do{
-		write(tobin(w),' ');
-		if d do{
-			print();
+		if ++x%2 do{
+			write(w);
+		}else{
+			write(" ");
 		}
-		d=1-d;
 	}
 	print();
-*/}
+	x=1;
+	for w in a do{
+		if ++x%2 do{
+			write(w);
+		}else{
+			write(" ");
+		}
+	}
+	print();
+}

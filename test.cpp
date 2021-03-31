@@ -1,4 +1,5 @@
-def1(tobin,q){
+def1(tobin,f){
+	let q=int32_t(f);
 	let res=str();
 	let c=int(0);
 	for w in range(int(sizeof(q)*8-1),int(-1),int(-1)) do{
@@ -14,5 +15,24 @@ def1(tobin,q){
 
 
 pony_run{
-	let q=int(4036005256);
+	let a=str("¡™£¢∞§¶•ªºœ∑´®†¥¨ˆøπ“‘åß∂ƒ©˙∆˚¬…æђxcvіƒm≤≥їјџўќ†њѓѕ'‘“«dzћ÷…•∆љl«єђxcvіƒm≤≥ї");
+	print(a)
+	let x=0;
+	for w in a do{
+		if ++x%2 do{
+			write(w);
+		}else{
+			write(" ");
+		}
+	}
+	print();
+	x=1;
+	for w in a do{
+		if ++x%2 do{
+			write(w);
+		}else{
+			write(" ");
+		}
+	}
+	print();
 }
