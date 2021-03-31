@@ -72,9 +72,9 @@ template<typename t>
 to_make_str(std::vector<t>,s<<"[";let y=len(orig);for w in orig do{s<<w<<((--y)?", ":"");};s<<"]";)
 
 #define scan(t) scan_f<t>()
-template <typename t>
-t scan_f(){
-	t q;
+template <t>
+auto scan_f(){
+	let q=t();
 	std::cin>>q;
 	return q;
 }
