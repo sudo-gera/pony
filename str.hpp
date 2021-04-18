@@ -101,7 +101,7 @@ std::u32string join(std::u32string self,std::vector<std::u32string> a){
 	return res;
 }
 
-int64_t chr(int64_t q){
+char32_t chr(int64_t q){
 	if(q<(1<<7)){
 		return ((q&127)<<0);
 	}
@@ -118,7 +118,7 @@ int64_t chr(int64_t q){
 	return 0;
 }
 
-int64_t ord(int64_t q){
+int64_t ord(char32_t q){
 	int64_t r=0;
 	int w,e;
 	for (w=3*8;w>-1;w-=8){

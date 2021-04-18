@@ -3,12 +3,9 @@ using ___main=old_int;
 #else
 using ___main=int;
 #endif
-#define pony_wakeup using namespace std;
 #define pony_run void pony()
-#include "funcsynt.hpp"
 #define let auto
 #define var auto
-#define len(q) q.size()
 #define append push_back
 #define in :
 #define while while(
@@ -16,7 +13,6 @@ using ___main=int;
 #define if if(
 #define elif else if
 #define for for(auto 
-typedef std::u32string str_t;
 #define int int64_t
 #define float (long double)
 #define type(q) decltype(q())
@@ -40,69 +36,97 @@ ___main main(___main _argc,char**_argv){
 }
 
 
-#define vect(...) vect_funct({__VA_ARGS__})
-template <typename t>
-std::vector<t> vect_funct(std::initializer_list<t> a){
-	std::vector<t> s(a.begin(),a.end());
-	return s;
+template <typename... t>
+auto vect(t... a){
+	auto s={a...};
+	auto f=*s.begin();
+	auto d=std::vector<decltype(f)>(s.begin(),s.end());
+	return d;
 }
 
-#define vect_by_val(t) vector<decltype(t)>()
-#define vect_by_type(t) vector<t>()
 
 std::u32string str(){
 	return std::u32string();
 }
 
-#define to_make_str(type,code) std::u32string str(type orig){let s=std::stringstream();code;return to_u32(s.str());}
+template<typename T>
+std::u32string str(T input){
+	return human_cast(input,std::u32string());
+}
 
-to_make_str(const int8_t,s<<int(orig))
-to_make_str(const int16_t,s<<orig)
-to_make_str(const int32_t,s<<orig)
-to_make_str(const int64_t,s<<orig)
-to_make_str(const char,let d=str();d.push_back(char32_t(orig));s<<to_u8(d))
-to_make_str(const char16_t,let d=str();d.push_back(char32_t(orig));s<<to_u8(d))
-to_make_str(const char32_t,let d=str();d.push_back(char32_t(orig));s<<to_u8(d))
-to_make_str(const bool,s<<(orig?"True":"False"))
-to_make_str(const char *,s<<orig)
-// to_make_str(float,s<<orig)
-to_make_str(const std::string,s<<orig)
-to_make_str(const std::u32string,s<<to_u8(orig))
+int64_t num(){
+	return std::int64_t();
+}
 
-template<typename t>
-to_make_str(std::vector<t>,s<<"[";let y=len(orig);for w in orig do{s<<w<<((--y)?", ":"");};s<<"]";)
+template<typename T>
+int64_t num(T input){
+	return human_cast(input,int64_t());
+}
 
-/*#define scan(t) scan_from_type<t>()
-template <typename t>
-auto scan_from_type(){
-	let q=t();
-	std::cin>>q;
-	return q;
-}*/
+int64_t real(){
+	return std::int64_t();
+}
+
+template<typename T>
+int64_t real(T input){
+	return human_cast(input,int64_t());
+}
+
+std::string cpp_str(std::u32string input){
+	return to_u8(input);
+}
+
+std::string c_str(std::u32string input){
+	return to_u8(input).c_str();
+}
 
 #define scan(t) scan_f(t())
 #define to_make_scan(type,code) auto scan_f(type orig){code;return orig;}
 
 to_make_scan(int64_t,std::cin>>orig)
 to_make_scan(char,std::cin>>orig)
-to_make_scan(str_t,let d=std::string();std::cin>>d;orig=to_u32(d))
+to_make_scan(std::u32string,let d=std::string();std::cin>>d;orig=to_u32(d))
 to_make_scan(std::string,std::cin>>orig)
 // to_make_scan(float,std::cin>>orig)
 
 
 
-#define print(...) print_f(__VA_ARGS__);
 template <typename... t>
-void print_f(t... a){
+void print(t... a){
 	int y=sizeof...(t);
-	int dummy[sizeof...(t)] = { (std::cout<<to_u8(str(a))<<((--y)?" ":""), 0)... };
+	int printed[sizeof...(t)] = { (std::cout<<to_u8(str(a))<<((--y)?" ":""), 0)... };
 	std::cout<<std::endl;
 }
 
-#define write(...) print_nn_f(__VA_ARGS__);
 template <typename... t>
-void print_nn_f(t... a){
-	int dummy[sizeof...(t)] = { (std::cout<<to_u8(str(a))                , 0)... };
+void write(t... a){
+	int printed[sizeof...(t)] = { (std::cout<<to_u8(str(a))                , 0)... };
 }
 
 
+def1 (len,q){
+	return int64_t(q.size());
+}
+
+
+def2(each_f,&a,f){
+	let g=std::vector<decltype(f(*a.begin()))>();
+	for w in a do{
+		g.append(f(w));
+	}
+	return g;
+}
+
+
+def2(filter_f,&a,f){
+	let g=std::vector<decltype(f(*a.begin()))>();
+	for w in a do{
+		if f(w) do{
+			g.append(w);
+		}
+	}
+	return g;
+}
+
+#define filter(arr,iter,...) filter_f(arr,[&](auto iter){return __VA_ARGS__;})
+#define each(arr,iter,...) each_f(arr,[&](auto iter){return __VA_ARGS__;})
