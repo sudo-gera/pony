@@ -13,9 +13,9 @@ using ___main=int;
 #define if if(
 #define elif else if
 #define for for(auto 
-#define int int64_t
 #define float (long double)
 #define type(q) decltype(q())
+#define self (*this)
 #ifdef inf_included
 	using long_int=inf;
 #else
@@ -37,11 +37,22 @@ ___main main(___main _argc,char**_argv){
 
 
 template <typename... t>
-auto vect(t... a){
+auto br(t... a){
 	auto s={a...};
 	auto f=*s.begin();
 	auto d=std::vector<decltype(f)>(s.begin(),s.end());
 	return d;
+}
+
+template <typename t1,typename t2>
+auto vect(t1 b,t2 e){
+//	std::cout<<filt(typeid(*b).name())<<'\n';
+	auto a=std::vector<typename std::remove_reference<decltype(*b)>::type>();
+	while b!=e do{
+		a.append(*b);
+		++b;
+	}
+	return a;
 }
 
 
@@ -93,18 +104,18 @@ to_make_scan(std::string,std::cin>>orig)
 
 template <typename... t>
 void print(t... a){
-	int y=sizeof...(t);
-	int printed[sizeof...(t)] = { (std::cout<<to_u8(str(a))<<((--y)?" ":""), 0)... };
+	int64_t y=sizeof...(t);
+	int64_t printed[sizeof...(t)] = { (std::cout<<to_u8(str(a))<<((--y)?" ":""), 0)... };
 	std::cout<<std::endl;
 }
 
 template <typename... t>
 void write(t... a){
-	int printed[sizeof...(t)] = { (std::cout<<to_u8(str(a))                , 0)... };
+	int64_t printed[sizeof...(t)] = { (std::cout<<to_u8(str(a))                , 0)... };
 }
 
 
-def1 (len,q){
+def1(len,q){
 	return int64_t(q.size());
 }
 
@@ -117,16 +128,16 @@ def2(each_f,&a,f){
 	return g;
 }
 
-
 def2(filter_f,&a,f){
-	let g=std::vector<decltype(f(*a.begin()))>();
+	let g=std::vector<typename std::remove_reference<decltype(*a.begin())>::type>();
 	for w in a do{
 		if f(w) do{
 			g.append(w);
-		}
+		}		
 	}
 	return g;
 }
 
 #define filter(arr,iter,...) filter_f(arr,[&](auto iter){return __VA_ARGS__;})
 #define each(arr,iter,...) each_f(arr,[&](auto iter){return __VA_ARGS__;})
+

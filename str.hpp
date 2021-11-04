@@ -6,6 +6,40 @@ bool endswith(std::u32string self, std::u32string edge){
 	return (self).find(edge,(self).size()-edge.size())==(self).size()-edge.size();
 }
 
+
+char32_t chr(int64_t q){
+	if(q<(1<<7)){
+		return ((q&127)<<0);
+	}
+	if(q<(1<<11)){
+		return 49280+((q&1984)<<2)+((q&63)<<0);
+	}
+	if(q<(1<<16)){
+		return 14712960+((q&61440)<<4)+((q&4032)<<2)+((q&63)<<0);
+	}
+	if(q<(1<<21)){
+		return 4034953344+((q&1835008)<<6)+((q&258048)<<4)+((q&4032)<<2)+((q&63)<<0);
+	}
+	std::cerr<<"error in chr(): "<<q<<" is too big"<<std::endl;
+	return 0;
+}
+
+int64_t ord(char32_t q){
+	int64_t r=0;
+	int w,e;
+	for (w=3*8;w>-1;w-=8){
+		int started=0;
+		for (e=7;e>-1;--e){
+			if (started==0 and (q&(1<<(w+e)))==0){
+				started=1;
+			} else
+			if (started){
+				r=(r<<1)+!!(q&(1<<(w+e)));
+			}
+		}
+	}
+	return r;
+}
 std::u32string to_u32(std::string q){
 	std::u32string r;
 	for(int64_t w=0;w<q.size();++w){
@@ -22,10 +56,16 @@ std::u32string to_u32(std::string q){
 			r.push_back(((int32_t(uint8_t(q[w]))<<24)+(int32_t(uint8_t(q[w+1]))<<16)+(int32_t(uint8_t(q[w+2]))<<8)+(int32_t(uint8_t(q[w+3]))<<0)));
 		}
 	}
+	for(auto &w:r){
+		w=ord(w);
+	}
 	return r;
 }
 
 std::string to_u8(std::u32string q){
+	for(auto &w:q){
+		w=chr(w);
+	}	
 	std::string r;
 	for(auto w:q){
 		if (w&0b11111111000000000000000000000000){
@@ -101,39 +141,6 @@ std::u32string join(std::u32string self,std::vector<std::u32string> a){
 	return res;
 }
 
-char32_t chr(int64_t q){
-	if(q<(1<<7)){
-		return ((q&127)<<0);
-	}
-	if(q<(1<<11)){
-		return 49280+((q&1984)<<2)+((q&63)<<0);
-	}
-	if(q<(1<<16)){
-		return 14712960+((q&61440)<<4)+((q&4032)<<2)+((q&63)<<0);
-	}
-	if(q<(1<<21)){
-		return 4034953344+((q&1835008)<<6)+((q&258048)<<4)+((q&4032)<<2)+((q&63)<<0);
-	}
-	printf("%lli is too big\n", q);
-	return 0;
-}
-
-int64_t ord(char32_t q){
-	int64_t r=0;
-	int w,e;
-	for (w=3*8;w>-1;w-=8){
-		int started=0;
-		for (e=7;e>-1;--e){
-			if (started==0 and (q&(1<<(w+e)))==0){
-				started=1;
-			} else
-			if (started){
-				r=(r<<1)+!!(q&(1<<(w+e)));
-			}
-		}
-	}
-	return r;
-}
 
 
 
