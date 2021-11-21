@@ -1,12 +1,12 @@
 template<int q>
 struct sized_data{char e[q];};
-template<typename T>
-char return_char(const T&q){
-	return '0';
-}
+// template<typename T>
+// char return_char(const T&q){
+// 	return '0';
+// }
 template<typename...T>
 auto count_args_as_data(const T&...a){
-	char t[]={return_char(a)...};
+	char t[]={(a,'0')...};
 	sized_data<sizeof(t)> f;
 	return f;
 }

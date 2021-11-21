@@ -9,7 +9,7 @@
 #define intmain _main
 #define ima _main
 #ifndef REALITY
-#include "unicorn.hpp"
+// #include "unicorn.hpp"
 #endif
 #define _rand srand(time(0));
 #define sysargv auto argv=std::vector<std::string>(_argv,_argv+_argc);
@@ -21,3 +21,4 @@ using namespace std;
 #define print(...) print(__VA_ARGS__);
 #define write(...) write(__VA_ARGS__);
 #define def auto
+#define pass

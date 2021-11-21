@@ -3,6 +3,16 @@ auto print_one(const bool&a){
 	c<<(a?"True":"False");
 	return c.str();
 }
+auto print_one(const int8_t&a){
+	std::stringstream c;
+	c<<int64_t(a);
+	return c.str();
+}
+auto print_one(const uint8_t&a){
+	std::stringstream c;
+	c<<uint64_t(a);
+	return c.str();
+}
 template <typename T>
 auto print_one(const T&a){
 	std::stringstream c;
@@ -193,7 +203,30 @@ auto monotonic(){
 	return (long double)(time.tv_sec)+(long double)(time.tv_nsec)/1'000'000'000.0;
 }
 
-
+struct perf{
+	uint64_t q;
+	perf(){
+		q=clock();
+	}
+	// template <typename T>
+	// perf(const T&q){
+	// 	this->q=q;
+	// }
+	// template <typename T>
+	// operator T(){
+	// 	return T(q);
+	// }
+	// friend auto operator-(const perf&q,const perf&w){
+	// 	return perf(q.q-w.q);
+	// }
+	// friend auto operator-=(const perf&q,const perf&w){
+	// 	return perf(q.q-w.q);
+	// }
+	friend auto&operator<<(std::ostream&q,const perf&w){
+		q<<1.0*(clock()-w.q)/CLOCKS_PER_SEC;
+		return q;
+	}
+};
 
 auto strip(const std::string&q){
 	size_t end=q.size()-1;
@@ -218,7 +251,7 @@ std::string radix_convert(std::string o,int64_t from,int64_t to){
 		o=strip(std::string(o.begin()+1,o.end()));
 	}
 	for (auto g:o){
-		res=res*from+"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f\x20\x21\x22\x23\x24\x25\x26\x27\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x3a\x3b\x3c\x3d\x3e\x3f\x40\x0a\x0b\x0c\x0d\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f\x20\x21\x22\x23\x5b\x5c\x5d\x5e\x5f\x60\x0a\x0b\x0c\x0d\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f\x20\x21\x22\x23\x7b\x7c\x7d\x7e\x7f"[g];
+		res=res*from+"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f\x20\x21\x22\x23\x24\x25\x26\x27\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x3a\x3b\x3c\x3d\x3e\x3f\x40\x0a\x0b\x0c\x0d\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f\x20\x21\x22\x23\x5b\x5c\x5d\x5e\x5f\x60\x0a\x0b\x0c\x0d\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f\x20\x21\x22\x23\x7b\x7c\x7d\x7e\x7f"[int(g)];
 	}
 	std::string r;
 	while (res){
@@ -278,8 +311,8 @@ std::string popen(std::string q){
 
 auto replace(std::string q,std::string w,std::string e){
 	std::string res;
-	int64_t a=0;
-	while (a<len(q)){
+	uint64_t a=0;
+	while (a<uint64_t(len(q))){
 		if (q.find(w,a)==a){
 			res+=e;
 			a+=w.size();
