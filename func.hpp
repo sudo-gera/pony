@@ -98,14 +98,27 @@ auto write(const T&...a){
 		}
 		res+=g;
 	}
-	std::cout<<res;
-	// int c=0;
-	// std::vector<int*>({((c?(int*)(&(std::cout<<" ")):(int*)(&(++c)))+print_one(a))...});
-	// std::cout<<std::endl;
+	std::cout<<res<<' '<<std::flush;
 }
 
 template <typename...T>
-auto test(int64_t line,std::string func,std::string args,const T&...a){
+auto put(const T&...a){
+	auto h=std::vector<std::string>({print_one(a)...});
+	std::string res;
+	int c=0;
+	for (auto&g:h){
+		if (c){
+			res+="";
+		}else{
+			c=1;
+		}
+		res+=g;
+	}
+	std::cout<<res<<std::flush;
+}
+
+template <typename...T>
+auto test(int64_t line,std::string file,std::string func,std::string args,const T&...a){
 	auto h=std::vector<std::string>({print_one(a)...});
 	std::string res;
 	int c=0;
@@ -124,7 +137,7 @@ auto test(int64_t line,std::string func,std::string args,const T&...a){
 			}
 		}
 	}
-	std::cout<<"\x1b[91mERROR \x1b[92mline \x1b[94m"<<line<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" : \x1b[0m"<<res<<std::endl;
+	std::cout<<"\x1b[91mERROR \x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" : \x1b[0m"<<res<<std::endl;
 	return;
 }
 
@@ -145,7 +158,7 @@ auto test(int64_t line,std::string func,std::string args,const T&...a){
 // }
 
 template <typename T>
-auto eic(int64_t line,std::string func,std::string args,const T& a){
+auto eic(int64_t line,std::string file,std::string func,std::string args,const T& a){
 	auto h=std::vector<std::string>({print_one(a)});
 	std::string res;
 	int c=0;
@@ -157,14 +170,14 @@ auto eic(int64_t line,std::string func,std::string args,const T& a){
 		}
 		res+=g;
 	}
-	std::cout<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" : \x1b[0m"<<res<<std::endl;
+	std::cout<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" : \x1b[0m"<<res<<std::endl;
 	return a;
 }
 
 // #define ic(...) ic(__LINE__,__PRETTY_FUNCTION__,#__VA_ARGS__,__VA_ARGS__);
-#define eic(...) eic(__LINE__,__PRETTY_FUNCTION__,#__VA_ARGS__,__VA_ARGS__)
-#define ic(...) std::cout<<"\x1b[92mline \x1b[94m"<<__LINE__<<"\x1b[92m func \x1b[94m"<<__PRETTY_FUNCTION__<<"\x1b[92m \x1b[93m"<<std::string(#__VA_ARGS__)<<" : \x1b[0m";print(__VA_ARGS__);
-#define test(...) test(__LINE__,__PRETTY_FUNCTION__,#__VA_ARGS__,__VA_ARGS__);
+#define eic(...) eic(__LINE__,__FILE__,__PRETTY_FUNCTION__,#__VA_ARGS__,__VA_ARGS__)
+#define ic(...) std::cout<<"\x1b[92mline \x1b[94m"<<__LINE__<<"\x1b[92m file \x1b[94m"<<__FILE__<<"\x1b[92m func \x1b[94m"<<__PRETTY_FUNCTION__<<"\x1b[92m \x1b[93m"<<std::string(#__VA_ARGS__)<<" : \x1b[0m";print(__VA_ARGS__);
+#define test(...) test(__LINE__,__FILE__,__PRETTY_FUNCTION__,#__VA_ARGS__,__VA_ARGS__);
 
 
 template<typename...T>

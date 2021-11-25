@@ -4,10 +4,7 @@
 #define for(...) for(auto __VA_ARGS__)
 #endif
 #define in :
-// #define _main using namespace std;signed main(signed _argc,char**_argv)
-#define _main using namespace std;signed main()
-#define intmain _main
-#define ima _main
+#define ima auto main(signed argc,char**argv) -> decltype(decltype(argc)(argv-argv))
 #ifndef REALITY
 // #include "unicorn.hpp"
 #endif

@@ -2,15 +2,21 @@
 template <typename T>
 std::string type(const T&q=T()){
 	std::string s;
-	FILE* pipe = popen((std::string("c++filt -t ")+typeid(q).name()).c_str(), "r");
-	while (!feof(pipe)) {
-		s+='\n';
-		fscanf(pipe,"%c",&(s[s.size()-1]));
+	s+="c++filt -t ";
+	s+=typeid(q).name();
+	FILE* pipe = popen(s.c_str(), "r");
+	s="";
+	int c= fgetc(pipe);
+	while (c != EOF) {
+		s.push_back(c);
+		c = fgetc(pipe);
 	}
 	pclose(pipe);
-	while (s.size() and s[s.size()-1]=='\n'){
-		s=std::string(s.begin(),s.end()-1);
+	while ( s.size() and isspace(s.back()) ){
+		s.pop_back();
 	}
 	return s;
 }
 
+// usage:
+	// std::cout << type(-1) << std::endl;
