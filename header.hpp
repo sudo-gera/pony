@@ -1,10 +1,12 @@
+#pragma once
 #include "pony.hpp"
+#define HOME 1
 #ifndef DEBUG
 #define int int64_t
 #define for(...) for(auto __VA_ARGS__)
 #endif
 #define in :
-#define ima auto main(signed argc,char**argv) -> decltype(decltype(argc)(argv-argv))
+#define ima auto main(signed _argc,char**_argv) -> decltype(decltype(_argc)(**_argv))
 #ifndef REALITY
 // #include "unicorn.hpp"
 #endif

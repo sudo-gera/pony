@@ -92,7 +92,7 @@ auto write(const T&...a){
 	int c=0;
 	for (auto&g:h){
 		if (c){
-			res+="";
+			res+=" ";
 		}else{
 			c=1;
 		}
@@ -379,3 +379,22 @@ auto readfilename(std::string q){
 	return a;
 }
 
+template<typename T1,typename T2>
+auto itervect(const T1&_q,const T2&e){
+	auto q=_q;
+	std::vector<typename std::remove_reference<decltype(*q)>::type> res;
+	while (q!=e){
+		res.push_back(*q);
+		++q;
+	}
+	return res;
+}
+
+template<typename T>
+T scan_one(){
+	T q;
+	std::cin>>q;
+	return q;
+}
+
+#define scan(...) scan_one<__VA_ARGS__>()
