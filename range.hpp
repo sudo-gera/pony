@@ -62,14 +62,14 @@
 
 auto range(int64_t w){
 	int64_t q=0,e=1;
-	std::vector<int> r;
+	std::vector<int64_t> r;
 	for (auto t=q;(e<0 or t<w) and (e>0 or t>w);t+=e){
 		r.push_back(t);
 	}
 	return r;
 }
 auto range(int64_t q,int64_t w,int64_t e=1){
-	std::vector<int> r;
+	std::vector<int64_t> r;
 	for (auto t=q;(e<0 or t<w) and (e>0 or t>w);t+=e){
 		r.push_back(t);
 	}

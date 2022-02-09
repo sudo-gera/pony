@@ -97,19 +97,27 @@ namespace json_ns{
 	struct json;
 	json loads(const std::string&q);
 	struct json{
-		int type=0;
-		int const_val=0;
+		size_t type=0;
+		size_t const_val=0;
 		// std::string number_val;
 		long long int int_val=0;
 		long double float_val=0;
-		int int_mode=0;
+		size_t int_mode=0;
 		std::string string_val;
 		std::vector<json> array_val;
 		std::map<std::string,json> object_val;
 		friend json loads(const std::string&q);
 	private:
 		void _(const std::string&_q){
-			std::string q=strip(_q);
+			size_t _qb=0;
+			size_t _qe=_q.size();
+			while (_qe and isspace(_q[_qe-1])){
+				_qe--;
+			}
+			while (_qb<_qe and isspace(_q[_qb])){
+				_qb++;
+			}
+			std::string q=std::string(_q.begin()+long(_qb),_q.begin()+long(_qe));
 			if (skip(q,"ntf")){
 				type=json_const;
 				if (q[0]=='n'){
@@ -166,20 +174,22 @@ namespace json_ns{
 							string_val+="\t";
 							h+=1;
 						}else if (skip(q,"u",h)!=h and q.size()-h>4){
-							char g[4];
-							for (auto f=0;f<4;++f){
-								g[f]=q[h+4-f];
-								if ('0'<=g[f] and g[f]<='9'){
-									g[f]-='0';
+							int g;
+							string_val+='\0';
+							for (size_t f=0;f<4;++f){
+								g=q[h+1+f];
+								if ('0'<=g and g<='9'){
+									g-='0';
 								}
-								if ('a'<=g[f] and g[f]<='f'){
-									g[f]-='a'+10;
+								if ('a'<=g and g<='f'){
+									g-=int('a')-10;
 								}
-								if ('A'<=g[f] and g[f]<='F'){
-									g[f]-='A'+10;
+								if ('A'<=g and g<='F'){
+									g-=int('A')-10;
 								}
+								string_val.back()*=16;
+								string_val.back()+=g;
 							}
-							string_val+=(*(uint32_t*)(g));
 							h+=5;
 						}
 					}else{
@@ -196,7 +206,7 @@ namespace json_ns{
 				while (h<q.size()-1 and h!=_h){
 					_h=h;
 					h=skip_value(q,h);
-					array_val.push_back(loads(std::string(q.begin()+_h,q.begin()+h)));
+					array_val.push_back(loads(std::string(q.begin()+long(_h),q.begin()+long(h))));
 					h=skip(q,",",h);
 					h=skip_whitespace(q,h);
 				}
@@ -208,11 +218,11 @@ namespace json_ns{
 				while (h<q.size()-1 and h!=_h){
 					_h=h;
 					h=skip_value(q,h);
-					auto k=loads(std::string(q.begin()+_h,q.begin()+h));
+					auto k=loads(std::string(q.begin()+long(_h),q.begin()+long(h)));
 					h=skip(q,":",h);
 					_h=h;
 					h=skip_value(q,h);
-					auto v=loads(std::string(q.begin()+_h,q.begin()+h));
+					auto v=loads(std::string(q.begin()+long(_h),q.begin()+long(h)));
 					h=skip(q,",",h);
 					h=skip_whitespace(q,h);
 					object_val[k]=v;
@@ -220,7 +230,7 @@ namespace json_ns{
 			}
 		}
 	public:
-		auto dumps()const{
+		auto dumps(bool alnum=0)const{
 			if (type==json_const){
 				std::string h[3]={"false","true","null"};
 				return h[const_val];
@@ -237,7 +247,7 @@ namespace json_ns{
 				auto res=std::string();
 				res+='"';
 				for (auto&w:string_val){
-					if (w<8 or w==11 or 13<w and w<32 or w==127){
+					if ((alnum==0 and (w<8 or w==11 or (13<w and w<32) or w==127)) or alnum==1){
 						res+="\\u00";
 						res+='0'+w/16;
 						if ('0'+10<=res.back()){
@@ -357,6 +367,21 @@ namespace json_ns{
 			int_mode=1;
 			int_val=q;
 		}
+		void __init__(unsigned const long long int&q){
+			type=json_number;
+			int_mode=1;
+			int_val=decltype(int_val)(q);
+		}
+		void __init__(unsigned const long int&q){
+			type=json_number;
+			int_mode=1;
+			int_val=decltype(int_val)(q);
+		}
+		void __init__(unsigned const int&q){
+			type=json_number;
+			int_mode=1;
+			int_val=decltype(int_val)(q);
+		}
 		void __init__(const bool&q){
 			type=json_const;
 			const_val=q;
@@ -427,10 +452,20 @@ namespace json_ns{
 		h._(q);
 		return h;
 	}
+	template <typename T>
+	auto dumps(const T&a){
+		return json(a).dumps();
+	}
+	template <typename T>
+	auto alnumdumps(const T&a){
+		return json(a).dumps(1);
+	}
 }
 
 using json_ns::json;
 using json_ns::loads;
+using json_ns::dumps;
+using json_ns::alnumdumps;
 
 
 // int main(){

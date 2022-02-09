@@ -1,6 +1,6 @@
 #include <string>
 template <typename T>
-std::string type(const T&q=T()){
+std::string type(const T&q){
 	std::string s;
 	s+="c++filt -t ";
 	s+=typeid(q).name();
@@ -8,7 +8,7 @@ std::string type(const T&q=T()){
 	s="";
 	int c= fgetc(pipe);
 	while (c != EOF) {
-		s.push_back(c);
+		s.push_back(static_cast<char>(c));
 		c = fgetc(pipe);
 	}
 	pclose(pipe);
@@ -16,6 +16,11 @@ std::string type(const T&q=T()){
 		s.pop_back();
 	}
 	return s;
+}
+
+template <typename T>
+std::string type(){
+	return type(T());
 }
 
 // usage:

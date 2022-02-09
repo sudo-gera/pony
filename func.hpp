@@ -1,26 +1,146 @@
-auto print_one(const bool&a){
+#define TO_REPEAT_SEP
+#define RP_0(x) TO_REPEAT(x)
+#define RP_1(x) RP_0(x##0) TO_REPEAT_SEP RP_0(x##1)
+#define RP_2(x) RP_1(x##0) TO_REPEAT_SEP RP_1(x##1)
+#define RP_3(x) RP_2(x##0) TO_REPEAT_SEP RP_2(x##1)
+#define RP_4(x) RP_3(x##0) TO_REPEAT_SEP RP_3(x##1)
+#define RP_5(x) RP_4(x##0) TO_REPEAT_SEP RP_4(x##1)
+#define RP_6(x) RP_5(x##0) TO_REPEAT_SEP RP_5(x##1)
+#define RP_7(x) RP_6(x##0) TO_REPEAT_SEP RP_6(x##1)
+#define RP_8(x) RP_7(x##0) TO_REPEAT_SEP RP_7(x##1)
+#define RP_9(x) RP_8(x##0) TO_REPEAT_SEP RP_8(x##1)
+#define REPEAT(x) RP_##x(0b)
+
+template<size_t N,typename...T>
+struct get_type_s;
+template<size_t N,typename Y,typename...T>
+struct get_type_s<N,Y,T...>{
+	using type=get_type_s<N-1,T...>;
+};
+template<typename Y>
+struct get_type_s<0,Y>{
+	using type=Y;
+};
+template<size_t N,typename...T>
+using get_type=typename get_type_s<N,T...>::type;
+
+template <typename t>
+auto to_str(const t&q)->decltype((    *(std::ostream*)(0)     <<q,str())){
+	std::stringstream ss;
+	ss<<q;
+	return ss.str();
+}
+
+auto to_str(const bool&a){
 	std::stringstream c;
 	c<<(a?"True":"False");
 	return c.str();
 }
-auto print_one(const int8_t&a){
+auto to_str(__int128_t a){
+	std::string q;
+	while (a){
+		q+='0'+a%10;
+		a/=10;
+	}
+	if (a<0){
+		q+='-';
+	}
+	if (q.size()==0){
+		q+='0';
+	}
+	reverse(q.begin(),q.end());
+	return q;
+}
+auto to_str(__uint128_t a){
+	std::string q;
+	while (a){
+		q+='0'+a%10;
+		a/=10;
+	}
+	if (q.size()==0){
+		q+='0';
+	}
+	reverse(q.begin(),q.end());
+	return q;
+}
+auto to_str(const int8_t&a){
 	std::stringstream c;
 	c<<int64_t(a);
 	return c.str();
 }
-auto print_one(const uint8_t&a){
+auto to_str(const uint8_t&a){
 	std::stringstream c;
 	c<<uint64_t(a);
 	return c.str();
 }
-template <typename T>
-auto print_one(const T&a){
-	std::stringstream c;
-	c<<a;
-	return c.str();
+
+str print_one(const str&q);
+template<typename T>
+auto print_one(const T&q)->std::enable_if_t<!std::is_same_v<std::add_const_t<std::remove_reference_t<decltype(q)>>,std::add_const_t<std::remove_reference_t<decltype(to_str(q))>>>,str>;
+
+template<typename T>
+auto print_one(const T&q)->std::enable_if_t<std::is_same_v<std::add_const_t<std::remove_reference_t<decltype(q)>>,std::add_const_t<std::remove_reference_t<decltype(to_str(q))>>>,str>;
+
+std::string running_file_path;
+template<typename T>
+int __zero=0;
+template<typename...Y>
+int ignore_args(const Y&...q){
+	auto s=std::vector<int>({__zero<decltype(q)>...});
+	return 0;
+}
+
+
+std::vector<std::string> get_fields(std::string q);
+
+template <typename Y,typename...T>
+auto to_str(const Y&q,const T&...a)->std::enable_if_t<
+(
+	std::is_copy_constructible_v<Y> or
+	(std::is_move_constructible_v<Y> and std::is_move_assignable_v<Y>)
+) and 
+(
+	std::is_aggregate_v<Y> or std::is_scalar_v<Y>
+)
+,std::string>{
+	ignore_args(a...);
+	std::stringstream ss;
+	auto tq=type(q);
+	ss<<tq;
+	auto f=get_fields(tq);
+	ss<<"({";
+	int c=0;
+	boost::pfr::for_each_field(
+	q,
+	[&](const auto&w){
+		if (c){
+			ss<<", ";
+		}
+		if (c<f.size()){
+			ss<<f[c]<<": ";
+		}
+		++c;
+		ss<<print_one(w);
+	});
+	ss<<"})";
+	return ss.str();
+}
+template <typename...T>
+auto to_str(const T&...a){
+	std::stringstream ss;
+	ignore_args(a...);
+	std::get<0>(std::make_tuple(std::ref(a)...)).
+	__how_to_print__;
+	return ss.str();
+}
+template <typename T1,typename T2>
+auto to_str(const std::pair<T1,T2>&a){
+	std::stringstream _c;
+	_c<<"<"<<a.first<<", "<<a.second<<">";
+	return _c.str();
 }
 template <typename T>
-auto print_one(const std::vector<T>&a){
+auto to_str(const std::vector<T>&a){
 	std::stringstream _c;
 	_c<<"[";
 	int c=0;
@@ -36,7 +156,39 @@ auto print_one(const std::vector<T>&a){
 	return _c.str();
 }
 template <typename T>
-auto print_one(const std::set<T>&a){
+auto to_str(const std::list<T>&a){
+	std::stringstream _c;
+	_c<<"[";
+	int c=0;
+	for (auto &w:a){
+		if (c){
+			_c<<", ";
+		}else{
+			++c;
+		}
+		_c<<print_one(w);
+	}
+	_c<<"]";
+	return _c.str();
+}
+template <typename T>
+auto to_str(const std::set<T>&a){
+	std::stringstream _c;
+	_c<<"{";
+	int c=0;
+	for (auto const&w:a){
+		if (c){
+			_c<<", ";
+		}else{
+			++c;
+		}
+		_c<<print_one(w);
+	}
+	_c<<"}";
+	return _c.str();
+}
+template <typename T>
+auto to_str(const std::unordered_set<T>&a){
 	std::stringstream _c;
 	_c<<"{";
 	int c=0;
@@ -52,7 +204,7 @@ auto print_one(const std::set<T>&a){
 	return _c.str();
 }
 template <typename T1,typename T2>
-auto print_one(const std::map<T1,T2>&a){
+auto to_str(const std::unordered_map<T1,T2>&a){
 	std::stringstream _c;
 	_c<<"{";
 	int c=0;
@@ -69,8 +221,26 @@ auto print_one(const std::map<T1,T2>&a){
 	_c<<"}";
 	return _c.str();
 }
+
+str print_one(const str&q){
+	return q;
+}
+template<typename T>
+auto print_one(const T&q)->std::enable_if_t<!std::is_same_v<std::add_const_t<std::remove_reference_t<decltype(q)>>,std::add_const_t<std::remove_reference_t<decltype(to_str(q))>>>,str>{
+	return print_one(to_str(q));
+}
+
+template<typename T>
+auto print_one(const T&q)->std::enable_if_t<std::is_same_v<std::add_const_t<std::remove_reference_t<decltype(q)>>,std::add_const_t<std::remove_reference_t<decltype(to_str(q))>>>,str>{
+	return
+	q.
+	__recursion__
+	;
+}
+
+
 template <typename...T>
-auto print(const T&...a){
+auto print_f(const T&...a){
 	auto h=std::vector<std::string>({print_one(a)...});
 	std::string res;
 	int c=0;
@@ -118,7 +288,7 @@ auto put(const T&...a){
 }
 
 template <typename...T>
-auto test(int64_t line,std::string file,std::string func,std::string args,const T&...a){
+auto check_output_f(int64_t line,std::string file,std::string func,std::string args,const T&...a){
 	auto h=std::vector<std::string>({print_one(a)...});
 	std::string res;
 	int c=0;
@@ -138,24 +308,118 @@ auto test(int64_t line,std::string file,std::string func,std::string args,const 
 		}
 	}
 	std::cout<<"\x1b[91mERROR \x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" : \x1b[0m"<<res<<std::endl;
+	std::exit(1);
 	return;
 }
 
-// template <typename...T>
-// auto ic(int64_t line,std::string func,std::string args,const T&...a){
-// 	auto h=std::vector<std::string>({print_one(a)...});
-// 	std::string res;
-// 	int c=0;
-// 	for (auto&g:h){
-// 		if (c){
-// 			res+=" ";
-// 		}else{
-// 			c=1;
-// 		}
-// 		res+=g;
-// 	}
-// 	std::cout<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" : \x1b[0m"<<res<<std::endl;
-// }
+
+struct inviz{
+	auto operator-(){
+		return *this;
+	}
+	template<typename T>
+	friend auto&operator-(const T&q,inviz w){
+		ignore_args(w);
+		return q; 
+	}
+};
+
+template<typename T>
+bool is_inviz_one(const T&q){
+	ignore_args(q);
+	return 0;
+}
+
+bool is_inviz_one(const inviz&q){
+	ignore_args(q);
+	return 1;
+}
+
+template<typename...T>
+bool is_inviz(const T&...q){
+	std::vector<bool> a({is_inviz_one(q)...});
+	for (auto w:a){
+		if (w){
+			return 1;
+		}
+	}
+	return 0;
+}
+
+std::string to_str(const inviz&q){
+	ignore_args(q);
+	return "";
+}
+
+template<typename...T>
+std::vector<str> print_mul(const T&...a){
+	return {print_one(a)...};
+}
+
+bool isvarname(char q){
+	return isalnum(q) or q=='_';
+}
+
+auto print_parse(str q){
+	std::vector<str> res;
+	size_t index=0;
+	while (index<q.size()){
+		while (index<q.size() and !isvarname(q[index])){
+			index++;
+		}
+		while (index<q.size() and isvarname(q[index])){
+			index++;
+		}
+		while (index<q.size() and !isvarname(q[index])){
+			index++;
+		}
+		res.emplace_back();
+		while (index<q.size() and isvarname(q[index])){
+			res[res.size()-1]+=q[index++];
+		}
+	}
+	return res;
+}
+
+
+#define enable_print(type,...)\
+str to_str(const type&val){\
+	auto q=print_mul(__VA_ARGS__);\
+	auto a=print_parse(#__VA_ARGS__);\
+	str res=str(#type)+"({";\
+	int c=0;\
+	for (size_t w=0;w<a.size();++w){\
+		res+=(c?", ":(c++,""))+a[w]+": "+q[w];\
+	}\
+	res+="})";\
+	return res;\
+}
+
+
+template <typename...T>
+void ic(int64_t line,std::string file,std::string func,std::string args,const T&...a){
+	auto h=std::vector<std::string>({print_one(a)...});
+	if (is_inviz(a...)){
+		h.clear();
+	}
+	std::string res;
+	int c=0;
+	for (auto&g:h){
+		if (c){
+			res+=" ";
+		}else{
+			c=1;
+		}
+		res+=g;
+	}
+	if (h.size()){
+		std::cout<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" : \x1b[0m"<<res<<std::endl;
+	}else{
+		std::cout<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" \x1b[0m"<<res<<std::endl;
+	}
+}
+
+
 
 template <typename T>
 auto eic(int64_t line,std::string file,std::string func,std::string args,const T& a){
@@ -174,11 +438,13 @@ auto eic(int64_t line,std::string file,std::string func,std::string args,const T
 	return a;
 }
 
+#define print(...) {running_file_path=__FILE__;print_f(__VA_ARGS__);}
 // #define ic(...) ic(__LINE__,__PRETTY_FUNCTION__,#__VA_ARGS__,__VA_ARGS__);
 #define eic(...) eic(__LINE__,__FILE__,__PRETTY_FUNCTION__,#__VA_ARGS__,__VA_ARGS__)
-#define ic(...) std::cout<<"\x1b[92mline \x1b[94m"<<__LINE__<<"\x1b[92m file \x1b[94m"<<__FILE__<<"\x1b[92m func \x1b[94m"<<__PRETTY_FUNCTION__<<"\x1b[92m \x1b[93m"<<std::string(#__VA_ARGS__)<<" : \x1b[0m";print(__VA_ARGS__);
-#define test(...) test(__LINE__,__FILE__,__PRETTY_FUNCTION__,#__VA_ARGS__,__VA_ARGS__);
-
+#define ic(...) {running_file_path=__FILE__;ic(__LINE__,__FILE__,__PRETTY_FUNCTION__,#__VA_ARGS__,__VA_ARGS__-inviz());}
+// #define ic(...) {std::cout<<"\x1b[92mline \x1b[94m"<<__LINE__<<"\x1b[92m file \x1b[94m"<<__FILE__<<"\x1b[92m func \x1b[94m"<<__PRETTY_FUNCTION__<<"\x1b[92m \x1b[93m"<<std::string(#__VA_ARGS__)<<" : \x1b[0m";print(__VA_ARGS__);}
+#define check_output(...) check_output_f(__LINE__,__FILE__,__PRETTY_FUNCTION__,#__VA_ARGS__,__VA_ARGS__);
+// #define test check_output
 
 template<typename...T>
 auto arr(T...a){
@@ -194,7 +460,7 @@ auto scan(T q=int64_t(0)){
 
 template<typename T>
 int64_t len(const T& q){
-	return q.size();
+	return int64_t(q.size());
 }
 
 int64_t random(int64_t q=9223372036854775807,int64_t w=-9223372036854775807){
@@ -208,12 +474,12 @@ int64_t random(int64_t q=9223372036854775807,int64_t w=-9223372036854775807){
 auto time(){
 	struct timespec time={0,0};
 	clock_gettime(CLOCK_REALTIME, &time);
-	return (long double)(time.tv_sec)+(long double)(time.tv_nsec)/1'000'000'000.0;
+	return static_cast<long double>(time.tv_sec)+static_cast<long double>(time.tv_nsec)/1'000'000'000.0;
 }
 auto monotonic(){
 	struct timespec time={0,0};
 	clock_gettime(CLOCK_MONOTONIC, &time);
-	return (long double)(time.tv_sec)+(long double)(time.tv_nsec)/1'000'000'000.0;
+	return static_cast<long double>(time.tv_sec)+static_cast<long double>(time.tv_nsec)/1'000'000'000.0;
 }
 
 struct perf{
@@ -235,9 +501,13 @@ struct perf{
 	// friend auto operator-=(const perf&q,const perf&w){
 	// 	return perf(q.q-w.q);
 	// }
-	friend auto&operator<<(std::ostream&q,const perf&w){
-		q<<1.0*(clock()-w.q)/CLOCKS_PER_SEC;
-		return q;
+	friend auto&operator<<(std::ostream&qqq,const perf&w){
+		qqq<<1.0*(clock()-w.q)/CLOCKS_PER_SEC;
+		return qqq;
+	}
+	template <typename T>
+	operator T(){
+		return 1.0*(clock()-q)/CLOCKS_PER_SEC;
 	}
 };
 
@@ -251,7 +521,7 @@ auto strip(const std::string&q){
 	while (start<end and isspace(q[start])){
 		++start;
 	}
-	return std::string(q.begin()+start,q.begin()+end);
+	return std::string(q.begin()+long(start),q.begin()+long(end));
 }
 
 
@@ -316,9 +586,10 @@ std::string popen(std::string q){
 	auto pipe=popen(q.c_str(), "r");
 	int c; // note: int, not char, required to handle EOF
 	while ((c = fgetc(pipe)) != EOF) { // standard C I/O file reading loop
-		s+=c;
+		s+=static_cast<char>(c);
 	}
 	pclose(pipe);
+	// print(s);
 	return s;
 }
 
@@ -340,8 +611,9 @@ auto replace(std::string q,std::string w,std::string e){
 std::string python(std::string q){
 	q=replace(q,"\\","\\\\");
 	q=replace(q,"\"","\\\"");
-
-	return popen("python -c \""+q+"\"");
+	q=replace(q,"`","\\`");
+	q=replace(q,"$","\\$");
+	return popen("python3 -c \""+q+"\"");
 }
 
 auto split(std::string q){
@@ -367,13 +639,16 @@ auto readfile(FILE*q){
 	std::string s;
 	int c; // note: int, not char, required to handle EOF
 	while ((c = fgetc(q)) != EOF) { // standard C I/O file reading loop
-		s+=c;
+		s+=static_cast<char>(c);
 	}
 	return s;
 }
 
 auto readfilename(std::string q){
 	FILE*g=fopen(q.c_str(),"r");
+	if (!g){
+		ic("file does not excists:",q)
+	}
 	auto a=readfile(g);
 	fclose(g);
 	return a;
@@ -398,3 +673,132 @@ T scan_one(){
 }
 
 #define scan(...) scan_one<__VA_ARGS__>()
+
+
+
+
+struct pyfunc_s{
+	std::string f;
+	std::string q;
+	auto&operator=(const std::string&_q){
+		f="def pyfunc("+f+"):\n"+_q;
+		return *this;
+	}
+	pyfunc_s(std::string _f):f(_f){}
+	template <typename...T>
+	auto operator()(const T&...a){
+		q="from json import *\nprint(dumps(pyfunc(";
+		std::vector<int>({add(a)...});
+		q+=")))";
+		auto code=f+"\n\n"+q+"\n\n";
+		q=code;
+		q="from json import *\nexec(loads("+alnumdumps(dumps(code))+"))\n";
+		return loads(python(q));
+	}
+	pyfunc_s(size_t line,std::string file,std::string _f):f(_f){
+		auto h=pyfunc_s("line,file")=
+		"	a=open(file).read().splitlines()[line:]\n"
+		"	a.append('')\n"
+		"	a=a[:a.index([w for w in a if not w.strip().startswith('//')][0])]\n"
+		"	a=[w.replace('//','  ',1) for w in a]\n"
+		"	a='\\n'.join(a)+'\\n'\n"
+		"	return a";
+		f="def pyfunc("+f+"):\n"+std::string(h(line,file));
+	}
+	template<typename T>
+	int add(const T&w){
+		q+="loads("+dumps(dumps(w))+"),";
+		return 0;
+	}
+};
+
+#define pyfunc(...) pyfunc_s(__LINE__,__FILE__,#__VA_ARGS__);
+
+#define refdecltype(...) remove_reference_t<decltype(__VA_ARGS__)>
+
+template<typename...base>
+struct __type_check;
+
+template<typename b1,typename...base>
+struct __type_check<b1,base...>{
+	template<typename...work>
+	struct eee;
+	template<typename w1,typename...work>
+	struct eee<w1,work...>{
+		const static bool value = __type_check<b1,base...>::eee<w1>::value and __type_check<b1,base...>::eee<work...>::value;
+	};
+	template<typename w1>
+	struct eee<w1>{
+		const static bool value = __type_check<b1>::template eee<w1>::value or __type_check<base...>::template eee<w1>::value;
+	};
+	template<>
+	struct eee<>{
+		const static bool value = 1;
+	};
+};
+
+template<typename b1>
+struct __type_check<b1>{
+	template<typename...work>
+	struct eee;
+	template<typename w1,typename...work>
+	struct eee<w1,work...>{
+		const static bool value = __type_check<b1>::eee<w1>::value and __type_check<b1>::eee<work...>::value;
+	};
+	template<typename w1>
+	struct eee<w1>{
+		const static bool value = std::is_same<b1,w1>::value;
+	};
+	template<>
+	struct eee<>{
+		const static bool value = 1;
+	};
+};
+
+template<>
+struct __type_check<>{
+	template<typename...work>
+	struct eee{
+		const static bool value = 0;
+	};
+	template<>
+	struct eee<>{
+		const static bool value = 1;
+	};
+};
+
+template<typename...work>
+struct all_types{
+	template<typename...base>
+	const bool static are_from=__type_check<base...>::template eee<work...>::value;
+};
+
+pyfunc_s py_import(str cf,str file,str name){
+	while (cf.size() and cf.end()[-1]!='/'){
+		cf=str(cf.begin(),cf.end()-1);
+	}
+	if (file.find('/')==file.npos){
+		file=cf+file;
+	}
+	if (file.size()<3 or not (file.end()[-3]=='.' and file.end()[-2]=='p' and file.end()[-1]=='y')){
+		file+=".py";
+	}
+	auto r=dumps(dumps(readfilename(file)+"\n\n__args__array.append("+name+")\n"));
+	return pyfunc_s("*__args__args")=
+	"	from sys import stderr\n"
+	"	__args__array=[]\n"
+	"	exec(loads("+r+"))\n"
+	"	f=__args__array[0]\n"
+	"	return f(*__args__args)\n";
+}
+#define import(f,...) auto f=py_import(__FILE__,#__VA_ARGS__,#f);
+
+str fields_db="{}";
+
+import(py_get_fields,get_fields)
+std::vector<str> get_fields(str type){
+	auto h= py_get_fields(fields_db,running_file_path,type);
+	fields_db=str(h[0]);
+	return h[1];
+}
+
