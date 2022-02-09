@@ -93,6 +93,7 @@ int ignore_args(const Y&...q){
 
 std::vector<std::string> get_fields(std::string q);
 
+#ifdef BOOST_INCLUDED
 template <typename Y,typename...T>
 auto to_str(const Y&q,const T&...a)->std::enable_if_t<
 (
@@ -125,6 +126,7 @@ auto to_str(const Y&q,const T&...a)->std::enable_if_t<
 	ss<<"})";
 	return ss.str();
 }
+#endif
 template <typename...T>
 auto to_str(const T&...a){
 	std::stringstream ss;
