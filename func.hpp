@@ -777,14 +777,17 @@ auto readfilename(std::string q){
 	return a;
 }
 
+template<typename T>
+auto get_type_f(const T&q){
+	auto tmp=*q;
+	return tmp;
+}
+
 template<typename T1,typename T2>
 auto itervect(const T1&_q,const T2&e){
 	auto q=_q;
 	// std::vector<typename std::remove_reference<decltype(*q)>::type> res;
-	std::vector<decltype(({
-		auto tmp=*q;
-		tmp;
-	}))> res;
+	std::vector<decltype(get_type_f(q))> res;
 	while (q!=e){
 		res.push_back(*q);
 		++q;
