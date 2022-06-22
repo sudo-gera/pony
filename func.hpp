@@ -101,12 +101,29 @@ auto to_str(const uint8_t&a){
 	return c.str();
 }
 
-str print_one(const str&q);
+str print_one(const str&q){
+	return q;
+}
 template<typename T>
-auto print_one(const T&q)->std::enable_if_t<!std::is_same_v<std::add_const_t<std::remove_reference_t<decltype(q)>>,std::add_const_t<std::remove_reference_t<decltype(to_str(q))>>>,str>;
+auto print_one(const T&q)->std::enable_if_t<!std::is_same_v<std::add_const_t<std::remove_reference_t<decltype(q)>>,std::add_const_t<std::remove_reference_t<decltype(to_str(q))>>>,str>{
+	return print_one(to_str(q));
+}
 
 template<typename T>
-auto print_one(const T&q)->std::enable_if_t<std::is_same_v<std::add_const_t<std::remove_reference_t<decltype(q)>>,std::add_const_t<std::remove_reference_t<decltype(to_str(q))>>>,str>;
+auto print_one(const T&q)->std::enable_if_t<std::is_same_v<std::add_const_t<std::remove_reference_t<decltype(q)>>,std::add_const_t<std::remove_reference_t<decltype(to_str(q))>>>,str>{
+	return
+	q.
+	__recursion__
+	;
+}
+
+
+// str print_one(const str&q);
+// template<typename T>
+// auto print_one(const T&q)->std::enable_if_t<!std::is_same_v<std::add_const_t<std::remove_reference_t<decltype(q)>>,std::add_const_t<std::remove_reference_t<decltype(to_str(q))>>>,str>;
+
+// template<typename T>
+// auto print_one(const T&q)->std::enable_if_t<std::is_same_v<std::add_const_t<std::remove_reference_t<decltype(q)>>,std::add_const_t<std::remove_reference_t<decltype(to_str(q))>>>,str>;
 
 std::string running_file_path;
 template<typename T>
@@ -337,21 +354,6 @@ auto to_str(const std::unordered_multimap<T1,T2>&a){
 	return _c.str();
 }
 
-str print_one(const str&q){
-	return q;
-}
-template<typename T>
-auto print_one(const T&q)->std::enable_if_t<!std::is_same_v<std::add_const_t<std::remove_reference_t<decltype(q)>>,std::add_const_t<std::remove_reference_t<decltype(to_str(q))>>>,str>{
-	return print_one(to_str(q));
-}
-
-template<typename T>
-auto print_one(const T&q)->std::enable_if_t<std::is_same_v<std::add_const_t<std::remove_reference_t<decltype(q)>>,std::add_const_t<std::remove_reference_t<decltype(to_str(q))>>>,str>{
-	return
-	q.
-	__recursion__
-	;
-}
 
 
 template <typename...T>
