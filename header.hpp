@@ -1,6 +1,6 @@
 #pragma once
 #if __cplusplus<201703
-#include <__cplusplus<201703>
+__need__cplusplus__17__
 #endif
 #include "pony.hpp"
 #define HOME 1
@@ -24,4 +24,18 @@ using namespace std;
 // #define put(...) put(__VA_ARGS__);
 #define def auto
 #define pass
+#define typeof(...) decltype(__VA_ARGS__)
+#undef assert
+#define assert(...) assert_f(__VA_ARGS__,#__VA_ARGS__)
+#define assert_m(...) assert_f(__VA_ARGS__,#__VA_ARGS__)
 
+bool assert_f(bool q,std::string f){
+	bool*a=&q;
+	if (not q){
+		cerr<<"\x1b[91massertion failed: \x1b[0m"<<f<<endl;
+		while (a){
+			q=*++a;
+		}
+	}
+	return q;
+}

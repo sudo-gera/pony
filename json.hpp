@@ -99,8 +99,12 @@ namespace json_ns{
 	struct json{
 		size_t type=0;
 		size_t const_val=0;
-		// std::string number_val;
+		std::string number_val;
+		#ifdef GMP_INCLUDED
+		mpz_class int_val=0;
+		#else
 		long long int int_val=0;
+		#endif
 		long double float_val=0;
 		size_t int_mode=0;
 		std::string string_val;
@@ -134,7 +138,11 @@ namespace json_ns{
 				type=json_number;
 				// number_val=q;
 				if (skip(q,"1234567890-",0,0)==q.size()){
+					#ifdef GMP_INCLUDED
+					int_val=q;
+					#else
 					int_val=stoll(q);
+					#endif
 					int_mode=1;
 				}else{
 					float_val=stold(q);
@@ -238,7 +246,11 @@ namespace json_ns{
 			if (type==json_number){
 				// return number_val;
 				if (int_mode){
+					#ifdef GMP_INCLUDED
+					return int_val.get_str();
+					#else
 					return std::to_string(int_val);
+					#endif
 				}else{
 					return std::to_string(float_val);
 				}
@@ -329,9 +341,9 @@ namespace json_ns{
 				return stold(string_val);
 			}
 			if (int_mode){
-				return int_val;
+				return T(int_val);
 			}else{
-				return float_val;
+				return T(float_val);
 			}
 		}
 		template <typename T>
@@ -342,7 +354,7 @@ namespace json_ns{
 		operator std::map<I,T>(){
 			std::map<I,T> res;
 			for (auto&w:object_val){
-				res[json(w.first)]=w.second;
+				res[json(w.first)]=T(w.second);
 			}
 			return res;
 		}
@@ -355,8 +367,19 @@ namespace json_ns{
 		void __init__(const long long int&q){
 			type=json_number;
 			int_mode=1;
+			#ifdef GMP_INCLUDED
+			int_val=std::to_string(q);
+			#else
+			int_val=q;
+			#endif
+		}
+		#ifdef GMP_INCLUDED
+		void __init__(const mpz_class&q){
+			type=json_number;
+			int_mode=1;
 			int_val=q;
 		}
+		#endif
 		void __init__(const long int&q){
 			type=json_number;
 			int_mode=1;
@@ -370,7 +393,11 @@ namespace json_ns{
 		void __init__(unsigned const long long int&q){
 			type=json_number;
 			int_mode=1;
+			#ifdef GMP_INCLUDED
+			int_val=std::to_string(q);
+			#else
 			int_val=decltype(int_val)(q);
+			#endif
 		}
 		void __init__(unsigned const long int&q){
 			type=json_number;

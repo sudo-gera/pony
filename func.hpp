@@ -1,3 +1,9 @@
+// namespace std{
+// #ifdef BOOST_INCLUDED
+// 	using namespace boost;
+// #endif
+// }
+
 #define TO_REPEAT_SEP
 #define RP_0(x) TO_REPEAT(x)
 #define RP_1(x) RP_0(x##0) TO_REPEAT_SEP RP_0(x##1)
@@ -9,7 +15,7 @@
 #define RP_7(x) RP_6(x##0) TO_REPEAT_SEP RP_6(x##1)
 #define RP_8(x) RP_7(x##0) TO_REPEAT_SEP RP_7(x##1)
 #define RP_9(x) RP_8(x##0) TO_REPEAT_SEP RP_8(x##1)
-#define REPEAT(x) RP_##x(0b)
+#define REPEAT(x) RP_##x(0b0)
 
 template<size_t N,typename...T>
 struct get_type_s;
@@ -36,6 +42,27 @@ auto to_str(const bool&a){
 	c<<(a?"True":"False");
 	return c.str();
 }
+
+auto print_one(const char*a){
+	std::stringstream c;
+	if (a){
+		c<<a;
+	}else{
+		c<<"(nullptr)";
+	}
+	return c.str();
+}
+
+auto print_one(char*a){
+	std::stringstream c;
+	if (a){
+		c<<a;
+	}else{
+		c<<"(nullptr)";
+	}
+	return c.str();
+}
+
 auto to_str(__int128_t a){
 	std::string q;
 	while (a){
@@ -106,10 +133,10 @@ auto to_str(const Y&q,const T&...a)->std::enable_if_t<
 ,std::string>{
 	ignore_args(a...);
 	std::stringstream ss;
-	auto tq=type(q);
+	auto tq=strtype(q);
 	ss<<tq;
 	auto f=get_fields(tq);
-	ss<<"({";
+	ss<<"(";
 	int c=0;
 	boost::pfr::for_each_field(
 	q,
@@ -118,23 +145,23 @@ auto to_str(const Y&q,const T&...a)->std::enable_if_t<
 			ss<<", ";
 		}
 		if (c<f.size()){
-			ss<<f[c]<<": ";
+			ss<<f[c]<<"=";
 		}
 		++c;
 		ss<<print_one(w);
 	});
-	ss<<"})";
+	ss<<")";
 	return ss.str();
 }
 #endif
-template <typename...T>
-auto to_str(const T&...a){
-	std::stringstream ss;
-	ignore_args(a...);
-	std::get<0>(std::make_tuple(std::ref(a)...)).
-	__how_to_print__;
-	return ss.str();
-}
+// template <typename...T>
+// auto to_str(const T&...a){
+// 	std::stringstream ss;
+// 	ignore_args(a...);
+// 	std::get<0>(std::make_tuple(std::ref(a)...)).
+// 	__how_to_print__;
+// 	return ss.str();
+// }
 template <typename T1,typename T2>
 auto to_str(const std::pair<T1,T2>&a){
 	std::stringstream _c;
@@ -173,8 +200,76 @@ auto to_str(const std::list<T>&a){
 	_c<<"]";
 	return _c.str();
 }
+template <typename T,typename CMP>
+auto to_str(const std::set<T,CMP>&a){
+	std::stringstream _c;
+	_c<<"{";
+	int c=0;
+	for (auto const&w:a){
+		if (c){
+			_c<<", ";
+		}else{
+			++c;
+		}
+		_c<<print_one(w);
+	}
+	_c<<"}";
+	return _c.str();
+}
+template <typename T,typename HASH>
+auto to_str(const std::unordered_set<T,HASH>&a){
+	std::stringstream _c;
+	_c<<"{";
+	int c=0;
+	for (auto const&w:a){
+		if (c){
+			_c<<", ";
+		}else{
+			++c;
+		}
+		_c<<print_one(w);
+	}
+	_c<<"}";
+	return _c.str();
+}
+template <typename T1,typename T2,typename CMP>
+auto to_str(const std::map<T1,T2,CMP>&a){
+	std::stringstream _c;
+	_c<<"{";
+	int c=0;
+	for (auto &w:a){
+		if (c){
+			_c<<", ";
+		}else{
+			++c;
+		}
+		_c<<print_one(w.first);
+		_c<<": ";
+		_c<<print_one(w.second);		
+	}
+	_c<<"}";
+	return _c.str();
+}
+template <typename T1,typename T2,typename HASH>
+auto to_str(const std::unordered_map<T1,T2,HASH>&a){
+	std::stringstream _c;
+	_c<<"{";
+	int c=0;
+	for (auto &w:a){
+		if (c){
+			_c<<", ";
+		}else{
+			++c;
+		}
+		_c<<print_one(w.first);
+		_c<<": ";
+		_c<<print_one(w.second);		
+	}
+	_c<<"}";
+	return _c.str();
+}
 template <typename T>
-auto to_str(const std::set<T>&a){
+auto to_str(const std::multiset<T>&a){
 	std::stringstream _c;
 	_c<<"{";
 	int c=0;
@@ -190,7 +285,7 @@ auto to_str(const std::set<T>&a){
 	return _c.str();
 }
 template <typename T>
-auto to_str(const std::unordered_set<T>&a){
+auto to_str(const std::unordered_multiset<T>&a){
 	std::stringstream _c;
 	_c<<"{";
 	int c=0;
@@ -206,7 +301,25 @@ auto to_str(const std::unordered_set<T>&a){
 	return _c.str();
 }
 template <typename T1,typename T2>
-auto to_str(const std::unordered_map<T1,T2>&a){
+auto to_str(const std::multimap<T1,T2>&a){
+	std::stringstream _c;
+	_c<<"{";
+	int c=0;
+	for (auto &w:a){
+		if (c){
+			_c<<", ";
+		}else{
+			++c;
+		}
+		_c<<print_one(w.first);
+		_c<<": ";
+		_c<<print_one(w.second);		
+	}
+	_c<<"}";
+	return _c.str();
+}
+template <typename T1,typename T2>
+auto to_str(const std::unordered_multimap<T1,T2>&a){
 	std::stringstream _c;
 	_c<<"{";
 	int c=0;
@@ -388,18 +501,18 @@ auto print_parse(str q){
 str to_str(const type&val){\
 	auto q=print_mul(__VA_ARGS__);\
 	auto a=print_parse(#__VA_ARGS__);\
-	str res=str(#type)+"({";\
+	str res=str(#type)+"(";\
 	int c=0;\
 	for (size_t w=0;w<a.size();++w){\
-		res+=(c?", ":(c++,""))+a[w]+": "+q[w];\
+		res+=(c?", ":(c++,""))+a[w]+"="+q[w];\
 	}\
-	res+="})";\
+	res+=")";\
 	return res;\
 }
 
 
 template <typename...T>
-void ic(int64_t line,std::string file,std::string func,std::string args,const T&...a){
+void ic_f(int64_t line,std::string file,std::string func,std::string args,const T&...a){
 	auto h=std::vector<std::string>({print_one(a)...});
 	if (is_inviz(a...)){
 		h.clear();
@@ -415,9 +528,9 @@ void ic(int64_t line,std::string file,std::string func,std::string args,const T&
 		res+=g;
 	}
 	if (h.size()){
-		std::cout<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" : \x1b[0m"<<res<<std::endl;
+		std::cerr<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" : \x1b[0m"<<res<<std::endl;
 	}else{
-		std::cout<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" \x1b[0m"<<res<<std::endl;
+		std::cerr<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" \x1b[0m"<<res<<std::endl;
 	}
 }
 
@@ -436,14 +549,16 @@ auto eic(int64_t line,std::string file,std::string func,std::string args,const T
 		}
 		res+=g;
 	}
-	std::cout<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" : \x1b[0m"<<res<<std::endl;
+	std::cerr<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" : \x1b[0m"<<res<<std::endl;
 	return a;
 }
 
 #define print(...) {running_file_path=__FILE__;print_f(__VA_ARGS__);}
+#define print_m(...) {running_file_path=__FILE__;print_f(__VA_ARGS__);}
 // #define ic(...) ic(__LINE__,__PRETTY_FUNCTION__,#__VA_ARGS__,__VA_ARGS__);
 #define eic(...) eic(__LINE__,__FILE__,__PRETTY_FUNCTION__,#__VA_ARGS__,__VA_ARGS__)
-#define ic(...) {running_file_path=__FILE__;ic(__LINE__,__FILE__,__PRETTY_FUNCTION__,#__VA_ARGS__,__VA_ARGS__-inviz());}
+#define ic(...) {running_file_path=__FILE__;ic_f(__LINE__,__FILE__,__PRETTY_FUNCTION__,#__VA_ARGS__,__VA_ARGS__-inviz());}
+#define ic_no_func(...) {running_file_path=__FILE__;ic_f(__LINE__,__FILE__,"",#__VA_ARGS__,__VA_ARGS__-inviz());}
 // #define ic(...) {std::cout<<"\x1b[92mline \x1b[94m"<<__LINE__<<"\x1b[92m file \x1b[94m"<<__FILE__<<"\x1b[92m func \x1b[94m"<<__PRETTY_FUNCTION__<<"\x1b[92m \x1b[93m"<<std::string(#__VA_ARGS__)<<" : \x1b[0m";print(__VA_ARGS__);}
 #define check_output(...) check_output_f(__LINE__,__FILE__,__PRETTY_FUNCTION__,#__VA_ARGS__,__VA_ARGS__);
 // #define test check_output
@@ -461,7 +576,7 @@ auto scan(T q=int64_t(0)){
 }
 
 template<typename T>
-int64_t len(const T& q){
+auto len(const T& q)->decltype(q.size()){
 	return int64_t(q.size());
 }
 
@@ -484,34 +599,40 @@ auto monotonic(){
 	return static_cast<long double>(time.tv_sec)+static_cast<long double>(time.tv_nsec)/1'000'000'000.0;
 }
 
-struct perf{
-	uint64_t q;
-	perf(){
+struct perf_s{
+	mutable uint64_t q;
+	perf_s(){
 		q=clock();
 	}
-	// template <typename T>
-	// perf(const T&q){
-	// 	this->q=q;
-	// }
-	// template <typename T>
-	// operator T(){
-	// 	return T(q);
-	// }
-	// friend auto operator-(const perf&q,const perf&w){
-	// 	return perf(q.q-w.q);
-	// }
-	// friend auto operator-=(const perf&q,const perf&w){
-	// 	return perf(q.q-w.q);
-	// }
-	friend auto&operator<<(std::ostream&qqq,const perf&w){
+	friend auto&operator<<(std::ostream&qqq,const perf_s&w){
 		qqq<<1.0*(clock()-w.q)/CLOCKS_PER_SEC;
+		w.q=clock();
 		return qqq;
 	}
 	template <typename T>
 	operator T(){
-		return 1.0*(clock()-q)/CLOCKS_PER_SEC;
+		auto z=1.0*(clock()-q)/CLOCKS_PER_SEC;
+		q=clock();
+		return z;
 	}
 };
+
+#define perf(...) perf_f(__LINE__,__FILE__,__PRETTY_FUNCTION__,__VA_ARGS__+0)
+
+uint64_t _perf_prev_=clock();
+
+template <typename...T>
+perf_s perf_f(int64_t line,std::string file,std::string func,int arg){
+	if (arg==0){
+		auto r=1.*(clock()-_perf_prev_)/CLOCKS_PER_SEC;
+		char t[1024];
+		sprintf(t,"%.9f",r);
+		std::cerr<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[0m "<<t<<std::endl;
+		_perf_prev_=clock();
+	}
+	return perf_s();
+}
+
 
 auto strip(const std::string&q){
 	size_t end=q.size()-1;
@@ -659,7 +780,11 @@ auto readfilename(std::string q){
 template<typename T1,typename T2>
 auto itervect(const T1&_q,const T2&e){
 	auto q=_q;
-	std::vector<typename std::remove_reference<decltype(*q)>::type> res;
+	// std::vector<typename std::remove_reference<decltype(*q)>::type> res;
+	std::vector<decltype(({
+		auto tmp=*q;
+		tmp;
+	}))> res;
 	while (q!=e){
 		res.push_back(*q);
 		++q;
@@ -668,7 +793,7 @@ auto itervect(const T1&_q,const T2&e){
 }
 
 template<typename T>
-T scan_one(){
+auto scan_one(){
 	T q;
 	std::cin>>q;
 	return q;
@@ -718,6 +843,7 @@ struct pyfunc_s{
 
 #define refdecltype(...) remove_reference_t<decltype(__VA_ARGS__)>
 
+#ifdef __clang__
 template<typename...base>
 struct __type_check;
 
@@ -774,6 +900,7 @@ struct all_types{
 	template<typename...base>
 	const bool static are_from=__type_check<base...>::template eee<work...>::value;
 };
+#endif
 
 pyfunc_s py_import(str cf,str file,str name){
 	while (cf.size() and cf.end()[-1]!='/'){
@@ -785,12 +912,18 @@ pyfunc_s py_import(str cf,str file,str name){
 	if (file.size()<3 or not (file.end()[-3]=='.' and file.end()[-2]=='p' and file.end()[-1]=='y')){
 		file+=".py";
 	}
-	auto r=dumps(dumps(readfilename(file)+"\n\n__args__array.append("+name+")\n"));
+	// auto r=dumps(dumps(readfilename(file)+"\n\n__args__array.append("+name+")\n"));
 	return pyfunc_s("*__args__args")=
-	"	from sys import stderr\n"
-	"	__args__array=[]\n"
-	"	exec(loads("+r+"))\n"
-	"	f=__args__array[0]\n"
+	"	from json import loads,dumps\n"
+	"	from sys import stderr,path\n"
+	"	from os.path import dirname\n"
+	"	q=("+alnumdumps(dumps(file))+")\n"
+	"	q=loads(q)\n"
+	"	path.append(dirname(q))\n"
+	"	q=q[len(dirname(q)):-3]\n"
+	"	if q[0]=='/': q=q[1:]\n"
+	"	f=__import__(q)\n"
+	"	f=f."+name+"\n"
 	"	return f(*__args__args)\n";
 }
 #define import(f,...) auto f=py_import(__FILE__,#__VA_ARGS__,#f);
@@ -799,8 +932,59 @@ str fields_db="{}";
 
 import(py_get_fields,get_fields)
 std::vector<str> get_fields(str type){
-	auto h= py_get_fields(fields_db,running_file_path,type);
-	fields_db=str(h[0]);
-	return h[1];
+	auto z=std::map<str,std::vector<str>>(loads(fields_db));
+	if (!z.count(type)){
+		auto h= py_get_fields(fields_db,running_file_path,type);
+		fields_db=str(h);
+	}
+	z=std::map<str,std::vector<str>>(loads(fields_db));
+	return z[type];
+}
+
+#define py_func(name) auto name = __LINE__ *= #name *= __py_func
+
+#define __py_func(...) (__py_func_s{.name="",.code=#__VA_ARGS__,.line=__LINE__,.file=__FILE__,.line1=0});
+
+struct __py_func_s{
+	str name;
+	str code;
+	uint64_t line=0;
+	str file;
+	uint64_t line1=0;
+};
+
+auto pyfunc_create(str name,str code,size_t line,str file,size_t line1){
+	auto s=pyfunc_s("code,line,file,line1")=
+	"	from sys import stderr\n"
+	"	from re import findall,split\n"
+	"	s=open(file).read().split('\\n')\n"
+	"	s='\\n'.join(s[line1:line-1])\n"
+	"	a=s[:len(s)-len(s.lstrip())]\n"
+	"	s=s[len(a):]\n"
+	"	a=a[::-1]\n"
+	"	a=a[:(a+'\\n').index('\\n')]\n"
+	"	a=a[::-1]\n"
+	"	s=a+s\n"
+	"	s=s.rstrip()\n"
+	"	s=s.splitlines()\n"
+	"	s=[w for w in s if w.strip()]\n"
+	"	s=[[w.index(w.lstrip()),w.lstrip()] for w in s]\n"
+	"	m=min(list(zip(*s))[0])\n"
+	"	s=[[w[0]-m+1,w[1]] for w in s]\n"
+	"	s=['\\t'*w[0]+w[1] for w in s]\n"
+	"	s='\\n'.join(s)\n"
+	"	s+='\\n\\n\\treturn "+name+"(*__args__args)\\n'\n"
+	"	return s\n";
+	str d=s(code,line,file,line1);
+	return pyfunc_s("*__args__args")=d;
+}
+
+auto operator*=(str a,__py_func_s s){
+	s.name=a;
+	return s;
+}
+
+auto operator*=(uint64_t a,__py_func_s s){
+	return pyfunc_create(s.name,s.code,s.line,s.file,a);
 }
 
