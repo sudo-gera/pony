@@ -1,12 +1,13 @@
+#include <iostream>
 #include <string>
-bool startswith(std::u32string self,std::u32string edge){
+template<typename T>
+bool startswith(T self,T edge){
 	return (self).rfind(edge,0)==0;
 }
-bool endswith(std::u32string self, std::u32string edge){
+template<typename T>
+bool endswith(T self, T edge){
 	return (self).find(edge,(self).size()-edge.size())==(self).size()-edge.size();
 }
-
-
 char32_t chr(int64_t q){
 	if(q<(1<<7)){
 		return ((q&127)<<0);
@@ -23,7 +24,6 @@ char32_t chr(int64_t q){
 	std::cerr<<"error in chr(): "<<q<<" is too big"<<std::endl;
 	return 0;
 }
-
 int64_t ord(char32_t q){
 	int64_t r=0;
 	int w,e;
@@ -82,11 +82,11 @@ std::string to_u8(std::u32string q){
 	return r;
 }
 
-
-std::u32string replace(std::u32string self, std::u32string old,std::u32string ne,int maxcount=-1){
-	std::u32string res=to_u32("");
-	for (int64_t w=0;w<(self).size();){
-		if (maxcount and (self).rfind(old,w)==w){
+template<typename T>
+auto replace(T self,T old,T ne,long maxcount=-1){
+	T res;
+	for (int64_t w=0;w<self.size();){
+		if (maxcount and self.rfind(old,w)==w){
 			res+=ne;
 			w+=old.size();
 			maxcount=maxcount>0?maxcount-1:maxcount;
@@ -97,12 +97,13 @@ std::u32string replace(std::u32string self, std::u32string old,std::u32string ne
 	}
 	return res;
 }
-std::vector<std::u32string> split(std::u32string self,std::u32string old,int maxcount=-1){
-	auto res=std::vector<std::u32string>();
-	res.push_back(std::u32string());
+template<typename T>
+std::vector<T> split(T self,T old,int maxcount=-1){
+	auto res=std::vector<T>();
+	res.push_back(T());
 	for (int64_t w=0;w<(self).size();){
 		if (maxcount and (self).rfind(old,w)==w){
-			res.push_back(std::u32string());
+			res.push_back(T());
 			w+=old.size();
 			maxcount=maxcount>0?maxcount-1:maxcount;
 		}else{
@@ -112,15 +113,16 @@ std::vector<std::u32string> split(std::u32string self,std::u32string old,int max
 	}
 	return res;
 }
-std::vector<std::u32string> split(std::u32string self){
-	auto res=std::vector<std::u32string>();
+template<typename T>
+std::vector<T> split(T self){
+	auto res=std::vector<T>();
 	int need_new=1;
 	for (int w=0;w<(self).size();++w){
-		if (std::u32string({9, 10, 11, 12, 13, 28, 29, 30, 31, 32}).find(std::u32string({(self)[w]}))!=-1){
+		if (T({9, 10, 11, 12, 13, 28, 29, 30, 31, 32}).find(T({(self)[w]}))!=-1){
 			need_new=1;
 		}else{
 			if (need_new){
-				res.push_back(std::u32string());
+				res.push_back(T());
 				need_new=0;
 			}
 			res[res.size()-1]+=(self)[w];
@@ -128,10 +130,11 @@ std::vector<std::u32string> split(std::u32string self){
 	}
 	return res;
 }
-std::u32string join(std::u32string self,std::vector<std::u32string> a){
-	std::u32string res;
+template<typename S,typename V>
+auto join(S self,const V&&a){
+	S res;
 	int c=0;
-	for (auto d:a){
+	for (auto&d:a){
 		if (c){
 			res+=self;
 		}
@@ -140,7 +143,16 @@ std::u32string join(std::u32string self,std::vector<std::u32string> a){
 	}
 	return res;
 }
-
-
-
-
+template<typename T>
+auto strip(const T&q){
+	size_t end=q.size()-1;
+	while (isspace(q[end])){
+		--end;
+	}
+	++end;
+	size_t start=0;
+	while (start<end and isspace(q[start])){
+		++start;
+	}
+	return T(q.begin()+long(start),q.begin()+long(end));
+}

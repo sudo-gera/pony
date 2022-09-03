@@ -1,3 +1,4 @@
+#include <vector>
 // // template <typename int64_t>
 // struct range_struct{
 // 	struct range_iterator{

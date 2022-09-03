@@ -1,3 +1,6 @@
+#include <iostream>
+#include <vector>
+#include <map>
 namespace json_ns{
 	auto skip(const std::string&q,const std::string&w,size_t h=0,size_t c=1){
 		while (h<q.size()){
