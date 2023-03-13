@@ -15,7 +15,7 @@ __need__cplusplus__17__
 #define _rand srand(time(0));
 #define sysargv auto argv=std::vector<std::string>(_argv,_argv+_argc);
 #define let auto
-#define var auto
+// #define var auto
 #define TO_STR(...) #__VA_ARGS__
 #define MACRO_TO_STR(...) TO_STR(__VA_ARGS__)
 using namespace std;

@@ -532,7 +532,7 @@ auto eic(int64_t line,std::string file,std::string func,std::string args,const T
 	return a;
 }
 
-#define print(...) {running_file_path=__FILE__;print_f(__VA_ARGS__);}
+// #define print(...) {running_file_path=__FILE__;print_f(__VA_ARGS__);}
 #define print_m(...) {running_file_path=__FILE__;print_f(__VA_ARGS__);}
 // #define ic(...) ic(__LINE__,__PRETTY_FUNCTION__,#__VA_ARGS__,__VA_ARGS__);
 #define eic(...) eic(__LINE__,__FILE__,__PRETTY_FUNCTION__,#__VA_ARGS__,__VA_ARGS__)

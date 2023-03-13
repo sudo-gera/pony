@@ -33,7 +33,7 @@ std::string strtype() {
 }
 
 template <typename T>
-std::string strtype(const T&q) {
+std::string strtype([[maybe_unused]]const T&q) {
 	return strtype<T>();
 }
 
@@ -44,7 +44,7 @@ std::string wstrtype() {
 }
 
 template <typename T>
-std::string wstrtype(const T&q) {
+std::string wstrtype([[maybe_unused]]const T&q) {
 	return wstrtype<T>();
 }
 
