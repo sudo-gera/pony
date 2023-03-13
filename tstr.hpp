@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <chrono>
+#include <mutex>
 
 template<size_t N,typename...T>
 struct get_type_s;
@@ -510,9 +511,11 @@ auto print_one(const T&q)->str{
 	return print_one(to_str(q));
 }
 
+std::mutex ic_m;
 
 template <typename...T>
 void ic_f(int64_t line,std::string file,std::string func,std::string args,const T&...a){
+	std::unique_lock lock(ic_m);
 	auto h=std::vector<std::string>({print_one(a)...});
 	if (is_inviz(a...)){
 		h.clear();
@@ -528,9 +531,11 @@ void ic_f(int64_t line,std::string file,std::string func,std::string args,const 
 		res+=g;
 	}
 	if (h.size()){
-		ic_output_stream<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" : \x1b[0m"<<res<<std::endl;
+		// ic_output_stream<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" : \x1b[0m"<<res<<std::endl;
+		ic_output_stream<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m:\x1b[94m"<<line<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" : \x1b[0m"<<res<<std::endl;
 	}else{
-		ic_output_stream<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" \x1b[0m"<<res<<std::endl;
+		// ic_output_stream<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" \x1b[0m"<<res<<std::endl;
+		ic_output_stream<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m:\x1b[94m"<<line<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" \x1b[0m"<<res<<std::endl;
 	}
 }
 
@@ -538,6 +543,7 @@ void ic_f(int64_t line,std::string file,std::string func,std::string args,const 
 
 template <typename T>
 auto eic(int64_t line,std::string file,std::string func,std::string args,const T& a){
+	std::unique_lock lock(ic_m);
 	auto h=std::vector<std::string>({print_one(a)});
 	std::string res;
 	int c=0;
@@ -549,7 +555,8 @@ auto eic(int64_t line,std::string file,std::string func,std::string args,const T
 		}
 		res+=g;
 	}
-	ic_output_stream<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" : \x1b[0m"<<res<<std::endl;
+	// ic_output_stream<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" : \x1b[0m"<<res<<std::endl;
+	ic_output_stream<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m:\x1b[94m"<<line<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" : \x1b[0m"<<res<<std::endl;
 	return a;
 }
 
