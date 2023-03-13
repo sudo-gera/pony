@@ -1,3 +1,7 @@
+#ifndef ic_output_stream
+#define ic_output_stream ic_output_stream
+#endif
+
 #include <sstream>
 #include <vector>
 #include <list>
@@ -507,9 +511,9 @@ void ic_f(int64_t line,std::string file,std::string func,std::string args,const 
 		res+=g;
 	}
 	if (h.size()){
-		std::cerr<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" : \x1b[0m"<<res<<std::endl;
+		ic_output_stream<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" : \x1b[0m"<<res<<std::endl;
 	}else{
-		std::cerr<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" \x1b[0m"<<res<<std::endl;
+		ic_output_stream<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" \x1b[0m"<<res<<std::endl;
 	}
 }
 
@@ -528,7 +532,7 @@ auto eic(int64_t line,std::string file,std::string func,std::string args,const T
 		}
 		res+=g;
 	}
-	std::cerr<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" : \x1b[0m"<<res<<std::endl;
+	ic_output_stream<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" : \x1b[0m"<<res<<std::endl;
 	return a;
 }
 
