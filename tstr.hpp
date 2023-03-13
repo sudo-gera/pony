@@ -1,5 +1,5 @@
 #ifndef ic_output_stream
-#define ic_output_stream ic_output_stream
+#define ic_output_stream std::cerr
 #endif
 
 #include <sstream>
@@ -8,6 +8,7 @@
 #include <set>
 #include <unordered_map>
 #include <unordered_set>
+#include <chrono>
 
 template<size_t N,typename...T>
 struct get_type_s;
@@ -22,6 +23,12 @@ struct get_type_s<0,Y>{
 template<size_t N,typename...T>
 using get_type=typename get_type_s<N,T...>::type;
 
+template <typename t,typename y>
+auto to_str(const std::chrono::duration<t,y>&q){
+	std::stringstream ss;
+	ss<<q.count()*1.0*y::num/y::den;
+	return ss.str();
+}
 template <typename t>
 auto to_str(const t&q)->decltype((    *(std::ostream*)(0)     <<q,str())){
 	std::stringstream ss;
@@ -327,6 +334,16 @@ auto to_str(const std::unordered_multimap<T1,T2>&a){
 		_c<<print_one(w.second);		
 	}
 	_c<<"}";
+	return _c.str();
+}
+template <typename T>
+auto to_str(const std::optional<T>&a){
+	std::stringstream _c;
+	_c<<"(";
+	if (a.has_value()){
+		_c<<*a;
+	}
+	_c<<")";
 	return _c.str();
 }
 
