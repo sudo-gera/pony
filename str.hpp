@@ -42,7 +42,7 @@ int64_t ord(char32_t q){
 }
 std::u32string to_u32(std::string q){
 	std::u32string r;
-	for(int64_t w=0;w<q.size();++w){
+	for(uint64_t w=0;w<q.size();++w){
 		if ((q[w]&(0b10000000))==0){
 			r.push_back(((int32_t(uint8_t(q[w]))<<0)));
 		}
@@ -85,7 +85,7 @@ std::string to_u8(std::u32string q){
 template<typename T>
 auto replace(T self,T old,T ne,long maxcount=-1){
 	T res;
-	for (int64_t w=0;w<self.size();){
+	for (uint64_t w=0;w<self.size();){
 		if (maxcount and self.rfind(old,w)==w){
 			res+=ne;
 			w+=old.size();
@@ -101,7 +101,7 @@ template<typename T>
 std::vector<T> split(T self,T old,int maxcount=-1){
 	auto res=std::vector<T>();
 	res.push_back(T());
-	for (int64_t w=0;w<(self).size();){
+	for (uint64_t w=0;w<(self).size();){
 		if (maxcount and (self).rfind(old,w)==w){
 			res.push_back(T());
 			w+=old.size();
@@ -117,7 +117,7 @@ template<typename T>
 std::vector<T> split(T self){
 	auto res=std::vector<T>();
 	int need_new=1;
-	for (int w=0;w<(self).size();++w){
+	for (uint64_t w=0;w<(self).size();++w){
 		if (T({9, 10, 11, 12, 13, 28, 29, 30, 31, 32}).find(T({(self)[w]}))!=-1){
 			need_new=1;
 		}else{

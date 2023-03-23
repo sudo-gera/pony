@@ -1,9 +1,15 @@
+#ifndef ic_output_stream
+#define ic_output_stream std::cerr
+#endif
+
 #include <sstream>
 #include <vector>
 #include <list>
 #include <set>
 #include <unordered_map>
 #include <unordered_set>
+#include <chrono>
+#include <mutex>
 
 template<size_t N,typename...T>
 struct get_type_s;
@@ -18,6 +24,12 @@ struct get_type_s<0,Y>{
 template<size_t N,typename...T>
 using get_type=typename get_type_s<N,T...>::type;
 
+template <typename t,typename y>
+auto to_str(const std::chrono::duration<t,y>&q){
+	std::stringstream ss;
+	ss<<q.count()*1.0*y::num/y::den;
+	return ss.str();
+}
 template <typename t>
 auto to_str(const t&q)->decltype((    *(std::ostream*)(0)     <<q,str())){
 	std::stringstream ss;
@@ -432,6 +444,16 @@ auto to_str(const std::unordered_multimap<T1,T2>&a){
 	_c<<"}";
 	return _c.str();
 }
+template <typename T>
+auto to_str(const std::optional<T>&a){
+	std::stringstream _c;
+	_c<<"(";
+	if (a.has_value()){
+		_c<<*a;
+	}
+	_c<<")";
+	return _c.str();
+}
 
 
 
@@ -596,9 +618,11 @@ auto print_one(const T&q)->str{
 	return print_one(to_str(q));
 }
 
+std::mutex ic_m;
 
 template <typename...T>
 void ic_f(int64_t line,std::string file,std::string func,std::string args,const T&...a){
+	std::unique_lock lock(ic_m);
 	auto h=std::vector<std::string>({print_one(a)...});
 	if (is_inviz(a...)){
 		h.clear();
@@ -614,9 +638,11 @@ void ic_f(int64_t line,std::string file,std::string func,std::string args,const 
 		res+=g;
 	}
 	if (h.size()){
-		std::cerr<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" : \x1b[0m"<<res<<std::endl;
+		// ic_output_stream<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" : \x1b[0m"<<res<<std::endl;
+		ic_output_stream<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m:\x1b[94m"<<line<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" : \x1b[0m"<<res<<std::endl;
 	}else{
-		std::cerr<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" \x1b[0m"<<res<<std::endl;
+		// ic_output_stream<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" \x1b[0m"<<res<<std::endl;
+		ic_output_stream<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m:\x1b[94m"<<line<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" \x1b[0m"<<res<<std::endl;
 	}
 }
 
@@ -624,6 +650,7 @@ void ic_f(int64_t line,std::string file,std::string func,std::string args,const 
 
 template <typename T>
 auto eic(int64_t line,std::string file,std::string func,std::string args,const T& a){
+	std::unique_lock lock(ic_m);
 	auto h=std::vector<std::string>({print_one(a)});
 	std::string res;
 	int c=0;
@@ -635,11 +662,12 @@ auto eic(int64_t line,std::string file,std::string func,std::string args,const T
 		}
 		res+=g;
 	}
-	std::cerr<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" : \x1b[0m"<<res<<std::endl;
+	// ic_output_stream<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" : \x1b[0m"<<res<<std::endl;
+	ic_output_stream<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m:\x1b[94m"<<line<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[92m \x1b[93m"<<args<<" : \x1b[0m"<<res<<std::endl;
 	return a;
 }
 
-#define print(...) {running_file_path=__FILE__;print_f(__VA_ARGS__);}
+// #define print(...) {running_file_path=__FILE__;print_f(__VA_ARGS__);}
 #define print_m(...) {running_file_path=__FILE__;print_f(__VA_ARGS__);}
 // #define ic(...) ic(__LINE__,__PRETTY_FUNCTION__,#__VA_ARGS__,__VA_ARGS__);
 #define eic(...) eic(__LINE__,__FILE__,__PRETTY_FUNCTION__,#__VA_ARGS__,__VA_ARGS__)
