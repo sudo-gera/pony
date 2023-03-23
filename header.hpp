@@ -16,11 +16,7 @@
 #endif
 // #define _rand srand(time(0));
 #define sysargv auto argv=std::vector<std::string>(_argv,_argv+_argc);
-<<<<<<< HEAD
 // #define let auto
-=======
-#define let auto
->>>>>>> 7055bdeab3ba1d34a78074dad3b68759859392e5
 // #define var auto
 #define TO_STR(...) #__VA_ARGS__
 #define MACRO_TO_STR(...) TO_STR(__VA_ARGS__)
