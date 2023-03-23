@@ -184,7 +184,7 @@ auto to_str(const Y&q,const T&...a)->std::conditional_t<1,std::string,decltype(q
 	return ss.str();
 }
 template <typename...T>
-auto to_str(const T&...a){
+auto to_str([[maybe_unused]]const T&...a){
 	// std::stringstream ss;
 	// ignore_args(a...);
 	// std::get<0>(std::make_tuple(std::ref(a)...)).
@@ -200,27 +200,27 @@ auto to_str(const std::pair<T1,T2>&a){
 }
 template<typename T>
 requires (std::is_same_v<typename std::set<typename T::value_type>::iterator,T>)
-auto to_str(const T&q){
+auto to_str([[maybe_unused]]const T&q){
     return "set_iter";
 }
 template<typename T>
 requires (std::is_same_v<typename std::vector<typename T::value_type>::iterator,T>)
-auto to_str(const T&q){
+auto to_str([[maybe_unused]]const T&q){
     return "vector_iter";
 }
 template<typename T>
 requires (std::is_same_v<typename std::deque<typename T::value_type>::iterator,T>)
-auto to_str(const T&q){
+auto to_str([[maybe_unused]]const T&q){
     return "deque_iter";
 }
 template<typename T>
 requires (std::is_same_v<typename std::queue<typename T::value_type>::iterator,T>)
-auto to_str(const T&q){
+auto to_str([[maybe_unused]]const T&q){
     return "queue_iter";
 }
 template<typename T>
 requires (std::is_same_v<typename std::unordered_set<typename T::value_type>::iterator,T>)
-auto to_str(const T&q){
+auto to_str([[maybe_unused]]const T&q){
     return "unordered_set_iter";
 }
 template <typename T>
