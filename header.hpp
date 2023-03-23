@@ -1,6 +1,8 @@
 #pragma once
-#if __cplusplus<201703
-__need__cplusplus__17__
+#if __cplusplus<202000
+#define maybe_constexpr
+#else
+#define maybe_constexpr constexpr
 #endif
 #include "pony.hpp"
 #define HOME 1
@@ -8,14 +10,14 @@ __need__cplusplus__17__
 // #define int int64_t
 // #define for(...) for(auto __VA_ARGS__)
 // #endif
-#define ima ;auto main(signed _argc,char**_argv) -> decltype(decltype(_argc)(**_argv))
+// #define ima ;auto main(signed _argc,char**_argv) -> decltype(decltype(_argc)(**_argv))
 #ifndef REALITY
 // #include "unicorn.hpp"
 #endif
-#define _rand srand(time(0));
+// #define _rand srand(time(0));
 #define sysargv auto argv=std::vector<std::string>(_argv,_argv+_argc);
-#define let auto
-#define var auto
+// #define let auto
+// #define var auto
 #define TO_STR(...) #__VA_ARGS__
 #define MACRO_TO_STR(...) TO_STR(__VA_ARGS__)
 using namespace std;
@@ -39,3 +41,39 @@ bool assert_f(bool q,std::string f){
 	}
 	return q;
 }
+
+#define CL000 "\x1b[0m"
+#define CL030 "\x1b[30m"
+#define CL031 "\x1b[31m"
+#define CL032 "\x1b[32m"
+#define CL033 "\x1b[33m"
+#define CL034 "\x1b[34m"
+#define CL035 "\x1b[35m"
+#define CL036 "\x1b[36m"
+#define CL037 "\x1b[37m"
+#define CL040 "\x1b[40m"
+#define CL041 "\x1b[41m"
+#define CL042 "\x1b[42m"
+#define CL043 "\x1b[43m"
+#define CL044 "\x1b[44m"
+#define CL045 "\x1b[45m"
+#define CL046 "\x1b[46m"
+#define CL047 "\x1b[47m"
+#define CL030 "\x1b[30m"
+#define CL091 "\x1b[31m"
+#define CL092 "\x1b[32m"
+#define CL093 "\x1b[33m"
+#define CL094 "\x1b[34m"
+#define CL095 "\x1b[35m"
+#define CL096 "\x1b[36m"
+#define CL097 "\x1b[37m"
+#define CL100 "\x1b[100m"
+#define CL101 "\x1b[101m"
+#define CL102 "\x1b[102m"
+#define CL103 "\x1b[103m"
+#define CL104 "\x1b[104m"
+#define CL105 "\x1b[105m"
+#define CL106 "\x1b[106m"
+#define CL107 "\x1b[107m"
+
+

@@ -36,7 +36,7 @@ perf_s perf_f(int64_t line,std::string file,std::string func,int arg){
 	if (arg==0){
 		auto r=1.*(clock()-_perf_prev_)/CLOCKS_PER_SEC;
 		char t[1024];
-		sprintf(t,"%.9f",r);
+		snprintf(t,1000,"%.9f",r);
 		std::cerr<<"\x1b[92mline \x1b[94m"<<line<<"\x1b[92m file \x1b[94m"<<file<<"\x1b[92m func \x1b[94m"<<func<<"\x1b[0m "<<t<<std::endl;
 		_perf_prev_=clock();
 	}

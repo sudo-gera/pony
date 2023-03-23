@@ -128,8 +128,33 @@ auto to_str(const Y&q,const T&...a)->std::enable_if_t<
 	ss<<"(";
 	int c=0;
 	boost::pfr::for_each_field(
-	q,
-	[&](const auto&w){
+		q,
+		[&](const auto&w){
+			if (c){
+				ss<<", ";
+			}
+			if (c<f.size()){
+				ss<<f[c]<<"=";
+			}
+			++c;
+			ss<<print_one(w);
+		}
+	);
+	ss<<")";
+	return ss.str();
+}
+#endif
+template <typename Y,typename...T>
+auto to_str(const Y&q,const T&...a)->std::conditional_t<1,std::string,decltype(q.tuple())>{
+	ignore_args(a...);
+	std::stringstream ss;
+	auto tq=strtype(q);
+	ss<<tq;
+	auto f=get_fields(tq);
+	ss<<"(";
+	int c=0;
+	auto t=q.tuple();
+	auto _f=[&](const auto&w){
 		if (c){
 			ss<<", ";
 		}
@@ -138,24 +163,53 @@ auto to_str(const Y&q,const T&...a)->std::enable_if_t<
 		}
 		++c;
 		ss<<print_one(w);
-	});
+		return 0;
+	};
+	std::apply([&](const auto&...a){
+		int y[]={_f(a)...};
+	},t);
 	ss<<")";
 	return ss.str();
 }
-#endif
-// template <typename...T>
-// auto to_str(const T&...a){
-// 	std::stringstream ss;
-// 	ignore_args(a...);
-// 	std::get<0>(std::make_tuple(std::ref(a)...)).
-// 	__how_to_print__;
-// 	return ss.str();
-// }
+template <typename...T>
+auto to_str(const T&...a){
+	// std::stringstream ss;
+	// ignore_args(a...);
+	// std::get<0>(std::make_tuple(std::ref(a)...)).
+	// __how_to_print__;
+	// return ss.str();
+	return strtype<T...>();
+}
 template <typename T1,typename T2>
 auto to_str(const std::pair<T1,T2>&a){
 	std::stringstream _c;
-	_c<<"<"<<print_one(a.first)<<", "<<print_one(a.second)<<">";
+	_c<<"("<<print_one(a.first)<<", "<<print_one(a.second)<<")";
 	return _c.str();
+}
+template<typename T>
+requires (std::is_same_v<typename std::set<typename T::value_type>::iterator,T>)
+auto to_str(const T&q){
+    return "set_iter";
+}
+template<typename T>
+requires (std::is_same_v<typename std::vector<typename T::value_type>::iterator,T>)
+auto to_str(const T&q){
+    return "vector_iter";
+}
+template<typename T>
+requires (std::is_same_v<typename std::deque<typename T::value_type>::iterator,T>)
+auto to_str(const T&q){
+    return "deque_iter";
+}
+template<typename T>
+requires (std::is_same_v<typename std::queue<typename T::value_type>::iterator,T>)
+auto to_str(const T&q){
+    return "queue_iter";
+}
+template<typename T>
+requires (std::is_same_v<typename std::unordered_set<typename T::value_type>::iterator,T>)
+auto to_str(const T&q){
+    return "unordered_set_iter";
 }
 template <typename T>
 auto to_str(const std::vector<T>&a){
@@ -171,6 +225,59 @@ auto to_str(const std::vector<T>&a){
 		_c<<print_one(w);
 	}
 	_c<<"]";
+	return _c.str();
+}
+template <typename T>
+auto to_str(const std::deque<T>&a){
+	std::stringstream _c;
+	_c<<"[";
+	int c=0;
+	for (auto &w:a){
+		if (c){
+			_c<<", ";
+		}else{
+			++c;
+		}
+		_c<<print_one(w);
+	}
+	_c<<"]";
+	return _c.str();
+}
+template <typename T,auto n>
+auto to_str(const std::array<T,n>&a){
+	std::stringstream _c;
+	_c<<"[";
+	int c=0;
+	for (auto &w:a){
+		if (c){
+			_c<<", ";
+		}else{
+			++c;
+		}
+		_c<<print_one(w);
+	}
+	_c<<"]";
+	return _c.str();
+}
+template <typename...T>
+auto to_str(const std::tuple<T...>&a){
+	std::stringstream _c;
+	_c<<"(";
+	int c=0;
+	std::apply(
+			[&](const T&...w){
+			((c?_c<<", ":(++c,_c),_c<<print_one(w)), ...);
+		},a
+	);
+	_c<<")";
+	return _c.str();
+}
+template <typename...T>
+auto to_str(const std::variant<T...>&a){
+	std::stringstream _c;
+	std::visit([&](auto&&q){
+		_c<<strtype(q)<<"("<<print_one(q)<<")";
+	},a);
 	return _c.str();
 }
 template <typename T>
@@ -345,7 +452,7 @@ auto print_f(const T&...a){
 }
 
 template <typename...T>
-auto write(const T&...a){
+auto write_f(const T&...a){
 	auto h=std::vector<std::string>({print_one(a)...});
 	std::string res;
 	int c=0;
@@ -361,7 +468,7 @@ auto write(const T&...a){
 }
 
 template <typename...T>
-auto put(const T&...a){
+auto put_f(const T&...a){
 	auto h=std::vector<std::string>({print_one(a)...});
 	std::string res;
 	int c=0;

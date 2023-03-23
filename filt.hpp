@@ -40,7 +40,7 @@ std::string strtype(const T&q) {
 template <typename T>
 std::string wstrtype() {
 	return strtype<T>();
-	sprintf(0,"%i");
+	snprintf(0,0,"%i");
 }
 
 template <typename T>
@@ -48,3 +48,7 @@ std::string wstrtype(const T&q) {
 	return wstrtype<T>();
 }
 
+template <typename T>
+consteval void cwstrtype() {
+	snprintf(0,0,"%i");
+}
